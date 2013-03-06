@@ -28,12 +28,28 @@ with MinIMU-9-Arduino-AHRS. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+void printoffset(void)
+{
+  Serial.print("!OFFSET,GYRO,");
+  Serial.print(AN_OFFSET[0]);  //(int)read_adc(0)
+  Serial.print(",");
+  Serial.print(AN_OFFSET[1]);
+  Serial.print(",");
+  Serial.print(AN_OFFSET[2]);  
+  Serial.print(",ACC,");
+  Serial.print(AN_OFFSET[3]);
+  Serial.print (",");
+  Serial.print(AN_OFFSET[4]);
+  Serial.print (",");
+  Serial.print(AN_OFFSET[5]);
+}
+
 void printdata(void)
 {    
       Serial.print("!");
 
       #if PRINT_EULER == 1
-      Serial.print("ANG:");
+      Serial.print("ANG,");
       Serial.print(ToDeg(roll));
       Serial.print(",");
       Serial.print(ToDeg(pitch));
@@ -41,19 +57,19 @@ void printdata(void)
       Serial.print(ToDeg(yaw));
       #endif      
       #if PRINT_ANALOGS==1
-      Serial.print(",AN:");
+      Serial.print(",GYRO,");
       Serial.print(AN[0]);  //(int)read_adc(0)
       Serial.print(",");
       Serial.print(AN[1]);
       Serial.print(",");
       Serial.print(AN[2]);  
-      Serial.print(",");
+      Serial.print(",ACC,");
       Serial.print(AN[3]);
       Serial.print (",");
       Serial.print(AN[4]);
       Serial.print (",");
       Serial.print(AN[5]);
-      Serial.print(",");
+      Serial.print(",MAG,");
       Serial.print(c_magnetom_x);
       Serial.print (",");
       Serial.print(c_magnetom_y);
@@ -88,4 +104,5 @@ long convert_to_dec(float x)
 {
   return x*10000000;
 }
+
 

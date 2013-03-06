@@ -182,9 +182,7 @@ void setup()
     
   AN_OFFSET[5]-=GRAVITY*SENSOR_SIGN[5];
   
-  //Serial.println("Offset:");
-  for(int y=0; y<6; y++)
-    Serial.println(AN_OFFSET[y]);
+  printoffset();
   
   delay(2000);
   digitalWrite(STATUS_LED,HIGH);

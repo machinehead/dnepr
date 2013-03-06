@@ -113,8 +113,11 @@ yaw=0
 while 1:
     rate(100)
     line = ser.readline()
-    if line.find("!ANG:") != -1:          # filter out incomplete (invalid) lines
-        line = line.replace("!ANG:","")   # Delete "!ANG:"
+    if line.find("!OFFSET,") != -1:
+        print line
+        f.write(line)
+    elif line.find("!ANG,") != -1:          # filter out incomplete (invalid) lines
+        line = line.replace("!ANG,","")   # Delete "!ANG,"
         print line
         f.write(line)                     # Write to the output log file
         words = string.split(line,",")    # Fields split
