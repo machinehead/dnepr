@@ -111,6 +111,7 @@ roll=0
 pitch=0
 yaw=0
 while 1:
+    rate(100)
     line = ser.readline()
     if line.find("!ANG:") != -1:          # filter out incomplete (invalid) lines
         line = line.replace("!ANG:","")   # Delete "!ANG:"
