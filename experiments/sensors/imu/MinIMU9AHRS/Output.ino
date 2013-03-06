@@ -42,6 +42,7 @@ void printoffset(void)
   Serial.print(AN_OFFSET[4]);
   Serial.print (",");
   Serial.print(AN_OFFSET[5]);
+  Serial.println();
 }
 
 void printdata(void)
@@ -104,5 +105,4 @@ long convert_to_dec(float x)
 {
   return x*10000000;
 }
-
 
