@@ -38,8 +38,8 @@ while exist('runkey', 'file')
         accsLocal = (double([data{1,7:9}]) - offsetAccel) + (dcm'*[0. 0. 256.]')';
         accs = [accs; accsLocal];
         times = [times; iter];
-        vels = integrateAngle(accs .* (8 * 9.81 / 2048.), 0.02);
-        coords = integrateAngle(vels, 0.02);
+        vels = integrate(accs .* (8 * 9.81 / 2048.), 0.02);
+        coords = integrate(vels, 0.02);
       end
   end
   tm2 = clock();
