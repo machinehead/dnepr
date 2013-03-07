@@ -30,6 +30,7 @@ with MinIMU-9-Arduino-AHRS. If not, see <http://www.gnu.org/licenses/>.
 
 void printoffset(void)
 {
+  Serial.println(); // need this because offset line gets attached to header line in MATLAB otherwise
   Serial.print("!OFFSET,GYRO,");
   Serial.print(AN_OFFSET[0]);  //(int)read_adc(0)
   Serial.print(",");
@@ -76,6 +77,8 @@ void printdata(void)
       Serial.print(c_magnetom_y);
       Serial.print (",");
       Serial.print(c_magnetom_z);
+      Serial.print (",");
+      Serial.print(G_Dt);
       #endif
       /*#if PRINT_DCM == 1
       Serial.print (",DCM:");
