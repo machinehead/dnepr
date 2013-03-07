@@ -149,7 +149,9 @@ float Temporary_Matrix[3][3]={
   ,{
     0,0,0  }
 };
- 
+
+#define OFFSET_READINGS (64)
+
 void setup()
 { 
   Serial.begin(115200);
@@ -168,7 +170,7 @@ void setup()
   
   delay(20);
   
-  for(int i=0;i<32;i++)    // We take some readings...
+  for(int i=0;i<OFFSET_READINGS;i++)    // We take some readings...
     {
     Read_Gyro();
     Read_Accel();
@@ -178,7 +180,7 @@ void setup()
     }
     
   for(int y=0; y<6; y++)
-    AN_OFFSET[y] = AN_OFFSET[y]/32;
+    AN_OFFSET[y] = AN_OFFSET[y]/OFFSET_READINGS;
     
   AN_OFFSET[5]-=GRAVITY*SENSOR_SIGN[5];
   

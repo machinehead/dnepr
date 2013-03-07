@@ -52,11 +52,11 @@ void printdata(void)
 
       #if PRINT_EULER == 1
       Serial.print("ANG,");
-      Serial.print(ToDeg(roll));
+      Serial.print(ToDeg(roll),5);
       Serial.print(",");
-      Serial.print(ToDeg(pitch));
+      Serial.print(ToDeg(pitch),5);
       Serial.print(",");
-      Serial.print(ToDeg(yaw));
+      Serial.print(ToDeg(yaw),5);
       #endif      
       #if PRINT_ANALOGS==1
       Serial.print(",GYRO,");
@@ -78,7 +78,7 @@ void printdata(void)
       Serial.print (",");
       Serial.print(c_magnetom_z);
       Serial.print (",");
-      Serial.print(G_Dt);
+      Serial.print(G_Dt,5);
       #endif
       /*#if PRINT_DCM == 1
       Serial.print (",DCM:");
