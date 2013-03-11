@@ -1,5 +1,5 @@
 function [ ints ] = integrate( Y, xUnitSize )
-%INTEGRATEANGLE Cumulative trapezoid integral
+%INTEGRATE Cumulative trapezoid integral
 %   
     ints = zeros(size(Y));
     for i = 1:size(Y,2)
