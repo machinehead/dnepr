@@ -64,8 +64,7 @@ void Accel_Init()
   if (compass.getDeviceType() == LSM303DLHC_DEVICE)
   {
     compass.writeAccReg(LSM303_CTRL_REG1_A, 0x47); // normal power mode, all axes enabled, 50 Hz
-    compass.writeAccReg(LSM303_CTRL_REG4_A, 0x08); // high resolution output mode
-    compass.writeAccReg(LSM303_CTRL_REG4_A, 0x20); // 8 g full scale: FS = 10 on DLHC
+    compass.writeAccReg(LSM303_CTRL_REG4_A, 0x08); // 2g scale, high resolution output mode
   }
   else 
   {

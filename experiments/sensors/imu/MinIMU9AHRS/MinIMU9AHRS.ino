@@ -51,7 +51,10 @@ int SENSOR_SIGN[9] = {1,1,1,-1,-1,-1,1,1,1}; //Correct directions x,y,z - gyro, 
 
 // LSM303 accelerometer: 8 g sensitivity
 // 3.8 mg/digit; 1 g = 256
-#define GRAVITY 256  //this equivalent to 1G in the raw data coming from the accelerometer 
+//#define GRAVITY 256  //this equivalent to 1G in the raw data coming from the accelerometer 
+
+// 2g sensivity
+#define GRAVITY 1024 
 
 #define ToRad(x) ((x)*0.01745329252)  // *pi/180
 #define ToDeg(x) ((x)*57.2957795131)  // *180/pi
@@ -67,12 +70,12 @@ int SENSOR_SIGN[9] = {1,1,1,-1,-1,-1,1,1,1}; //Correct directions x,y,z - gyro, 
 
 // LSM303 magnetometer calibration constants; use the Calibrate example from
 // the Pololu LSM303 library to find the right values for your board
-#define M_X_MIN -513
-#define M_Y_MIN -696
-#define M_Z_MIN -463
-#define M_X_MAX 551
-#define M_Y_MAX 440
-#define M_Z_MAX 543
+#define M_X_MIN -414
+#define M_Y_MIN -471
+#define M_Z_MIN -681
+#define M_X_MAX 250
+#define M_Y_MAX 296
+#define M_Z_MAX 513
 
 #define Kp_ROLLPITCH 0.02
 #define Ki_ROLLPITCH 0.00002
@@ -96,7 +99,7 @@ long timer=0;   //general purpuse timer
 long timer_old;
 long timer24=0; //Second timer used to print values 
 int AN[6]; //array that stores the gyro and accelerometer data
-int AN_OFFSET[6]={0,0,0,0,0,0}; //Array that stores the Offset of the sensors
+float AN_OFFSET[6]={0,0,0,14.5000,-5.5000,-42.5000}; //Array that stores the Offset of the sensors
 
 int gyro_x;
 int gyro_y;
@@ -150,7 +153,7 @@ float Temporary_Matrix[3][3]={
     0,0,0  }
 };
 
-#define OFFSET_READINGS (64)
+#define OFFSET_READINGS (128)
 
 void setup()
 { 
@@ -171,18 +174,18 @@ void setup()
   delay(20);
   
   for(int i=0;i<OFFSET_READINGS;i++)    // We take some readings...
-    {
+  {
     Read_Gyro();
-    Read_Accel();
-    for(int y=0; y<6; y++)   // Cumulate values
+//    Read_Accel();
+    for(int y=0; y<3; y++)   // Cumulate values
       AN_OFFSET[y] += AN[y];
     delay(20);
-    }
+  }
     
-  for(int y=0; y<6; y++)
+  for(int y=0; y<3; y++)
     AN_OFFSET[y] = AN_OFFSET[y]/OFFSET_READINGS;
     
-  AN_OFFSET[5]-=GRAVITY*SENSOR_SIGN[5];
+//  AN_OFFSET[5]-=GRAVITY*SENSOR_SIGN[5];
   
   printoffset();
   
