@@ -70,12 +70,12 @@ int SENSOR_SIGN[9] = {1,1,1,-1,-1,-1,1,1,1}; //Correct directions x,y,z - gyro, 
 
 // LSM303 magnetometer calibration constants; use the Calibrate example from
 // the Pololu LSM303 library to find the right values for your board
-#define M_X_MIN -414
-#define M_Y_MIN -471
-#define M_Z_MIN -681
-#define M_X_MAX 250
-#define M_Y_MAX 296
-#define M_Z_MAX 513
+#define M_X_MIN -883
+#define M_Y_MIN -942
+#define M_Z_MIN -533
+#define M_X_MAX 320
+#define M_Y_MAX 481
+#define M_Z_MAX 452
 
 #define Kp_ROLLPITCH 0.02
 #define Ki_ROLLPITCH 0.00002
@@ -99,8 +99,8 @@ long timer=0;   //general purpuse timer
 long timer_old;
 long timer24=0; //Second timer used to print values 
 int AN[6]; //array that stores the gyro and accelerometer data
-float AN_OFFSET[6]={0,0,0,16,-3,-37}; //Array that stores the Offset of the sensors
-float ACC_GAIN[3]={1024./1013., 1024./1037., 1024./1053.};
+float AN_OFFSET[6]={0,0,0,26.5,-4.5,-35}; //Array that stores the Offset of the sensors
+float ACC_GAIN[3]={1024./1005.5, 1024./1025.5, 1024./1042.};
 
 int gyro_x;
 int gyro_y;

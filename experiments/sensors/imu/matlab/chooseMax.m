@@ -4,7 +4,7 @@ function [ topMax, hc ] = chooseMax( hc, edges )
 
         topMax = [];
         
-        for maxCount = 1:20
+        for maxCount = 1:3
             [maxHC, ind] = max(hc);
             maxRow = [];
             for j = 1:size(maxHC,2)

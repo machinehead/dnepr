@@ -11,7 +11,6 @@ function [accs] = accsHist()
     
     function [] = iter(anglesLoc, accsLoc, currTime, offsetGyro, offsetAccel)
         accs = [accs; accsLoc];
-        histCounts = histc(accs,edges);
 
         tm2 = currTime;
         if (tm2 - tm1 >= 0.5) 
