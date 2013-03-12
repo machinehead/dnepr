@@ -99,14 +99,15 @@ long timer=0;   //general purpuse timer
 long timer_old;
 long timer24=0; //Second timer used to print values 
 int AN[6]; //array that stores the gyro and accelerometer data
-float AN_OFFSET[6]={0,0,0,14.5000,-5.5000,-42.5000}; //Array that stores the Offset of the sensors
+float AN_OFFSET[6]={0,0,0,16,-3,-37}; //Array that stores the Offset of the sensors
+float ACC_GAIN[3]={1024./1013., 1024./1037., 1024./1053.};
 
 int gyro_x;
 int gyro_y;
 int gyro_z;
-int accel_x;
-int accel_y;
-int accel_z;
+float accel_x;
+float accel_y;
+float accel_z;
 int magnetom_x;
 int magnetom_y;
 int magnetom_z;

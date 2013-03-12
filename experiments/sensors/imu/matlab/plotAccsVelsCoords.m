@@ -1,54 +1,51 @@
 function [accs, vels, times] = plotAccsVelsCoords()
-    times = [0];
-    angles = [0 0 0];
-    accs = [0 0 0];
-    accsKalman = [0 0 0];
-    accsMovAvg = [0 0 0];
-    vels = [0 0 0];
-    velsMovAvg = [0 0 0];
-    velsKalman = [0 0 0];
-    % coords = [0 0 0];
-    accGain = [1024/1015 1024/1029.5 1024/1048];
+    times = [];
+    angles = [];
+    accs = [];
+    % accsKalman = [0 0 0];
+    vels = [];
+    % velsKalman = [0 0 0];
+    coords = [];
+    accGain = [1024./1013., 1024./1037., 1024./1053.];
     
     f1 = figure();
-    f2 = figure();
+    % f2 = figure();
     f3 = figure();
+    % f4 = figure();
     f5 = figure();
 
     K = 0.99;
 
+    tm1 = clock();
+    
     function [] = iter(anglesLoc, accsLoc, currTime, offsetGyro, offsetAccel)
         if currTime > 5
             dcm = dcmd(anglesLoc);
             angles = [angles; anglesLoc];
-            accsLoc = (accsLoc - offsetAccel - [40 -20 -70]) .* accGain - (dcm' * [0. 0. 1024.]')';
-            accs = [accs; accsLoc];
-            accsKalman = [accsKalman; K * accsKalman(size(accsKalman,1)) + (1-K) * accsLoc];
-            accsAvg = mean(accs(1:max(1,size(accs,1)-accMovAvgSamples+1),:),1);
-            accsMovAvg = [accsMovAvg; accsAvg];
+            % accsLoc = (accsLoc - offsetAccel) .* accGain - (dcm' * [0. 0. 1024.]')';
+            accsWorld = (dcm * ((accsLoc - offsetAccel) .* accGain)')' -  [0. 0. 1024.];
+            % accs = [accs; accsLoc];
+            accs = [accs; accsWorld];
+            % accsKalman = [accsKalman; K * accsKalman(size(accsKalman,1)) + (1-K) * accsLoc];
 
             times = [times; currTime];
-            vels = integrate(accs .* (2 * 9.81 / 2048.), 0.02);
-            velsMovAvg = integrate(accsMovAvg .* (2 * 9.81 / 2048.), 0.02);
-            velsKalman = integrate(accsKalman .* (2 * 9.81 / 2048.), 0.02);
-            % coords = integrate(vels, 0.02);
+            vels = cumsum(accs .* (9.81 / 1024.), 2) * 0.02;
+            % velsKalman = cumtrapz(accsKalman .* (9.81 / 1024.), 2) * 0.02;
+            coords = cumsum(vels) * 0.02;
 
             tm2 = clock();
             if etime(tm2,tm1) >= 1
-                figure(f1);plot(times, angles);
-                figure(f2);plot(times, accs);
-                figure(f3);plot(times, accsKalman);
-                % figure(f3);plot(times(1:size(vels,1)), vels);
-                % figure(f4);plot(times(1:size(velsMovAvg,1)), velsMovAvg);
-                figure(f5);plot(times(1:size(velsKalman,1)), velsKalman);
-                % figure(f4);plot(times(1:size(coords,1)), coords);
+                % figure(f1);plot(times, angles);
+                figure(f1);plot(times, accs);title('Accelerations');
+                % figure(f2);plot(times, accsKalman);title('Accelerations after Kalman filter');
+                figure(f3);plot(times(1:size(vels,1)), vels);title('Rect integral of accs');
+                % figure(f4);plot(times(1:size(velsKalman,1)), velsKalman);title('Trapezoid integral of Kalman accs');
+                figure(f5);plot(times(1:size(coords,1)), coords);title('Rect 2nd order integral of accs');
                 tm1 = tm2;
             end
         end
     end
 
-    tm1 = clock();
-    accMovAvgSamples = 10;
     serialLoop(@iter);
 
 end
