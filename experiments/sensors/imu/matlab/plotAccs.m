@@ -25,15 +25,15 @@ function [] = plotAccs()
     
     K = 0.99;
 
-    function [] = iter(anglesLoc, accsLoc, currTime, offsetGyro, offsetAccel)
+    function [] = iter(anglesAhrs, gyroSrc, accsSrc, magSrc, offsetGyro, offsetAccel, currTime, timeDelta)
         % static outlier elimination
-        if abs(sqrt(accsLoc * accsLoc') - 1024) < 100
-            accs = [accs; accsLoc];
+        if abs(sqrt(accsSrc * accsSrc') - 1024) < 100
+            accs = [accs; accsSrc];
             maxAccs = min(accs(max(1,size(accs,1)-50):size(accs,1),:), [], 1);
-            row = [(K * meanAccs(size(meanAccs,1),1:3) + (1-K) * accsLoc) maxAccs];
+            row = [(K * meanAccs(size(meanAccs,1),1:3) + (1-K) * accsSrc) maxAccs];
             meanAccs = [meanAccs; row];
             times = [times; currTime];
-            accLens = [accLens; sqrt(accsLoc * accsLoc')];
+            accLens = [accLens; sqrt(accsSrc * accsSrc')];
 
             tm2 = currTime;
             if (tm2 - tm1 >= 0.5) && (size(meanAccs,1) >= 1)

@@ -15,12 +15,12 @@ function [] = calibrate()
     % lenTol = 1.;
     accsMean = [0 0 0];
 
-    function [] = iter(anglesLoc, accsLoc, currTime, offsetGyro, offsetAccel)
-        accsLoc = accsLoc ./ 4;
+    function [] = iter(anglesAhrs, gyroSrc, accsSrc, magSrc, offsetGyro, offsetAccel, currTime, timeDelta)
+        accsSrc = accsSrc ./ 4;
         if size(accs,1) < 200
-            pass = (abs(accsLoc(1,3) - 64) <= zTol) && (abs(accsLoc(1,1) - 0) <= xTol) && (abs(accsLoc(1,2) - 0) <= yTol);
+            pass = (abs(accsSrc(1,3) - 64) <= zTol) && (abs(accsSrc(1,1) - 0) <= xTol) && (abs(accsSrc(1,2) - 0) <= yTol);
         else
-            accsOffset = accsLoc - accsMean + [0. 0. 64.];
+            accsOffset = accsSrc - accsMean + [0. 0. 64.];
             pass = (abs(accsOffset(1,3) - 64) <= zTol / 2) && (abs(accsOffset(1,1) - 0) <= xTol / 2) && (abs(accsOffset(1,2) - 0) <= yTol / 2);
             % len = sqrt(accsOffset * accsOffset');
             % times = [times; currTime];
@@ -29,8 +29,8 @@ function [] = calibrate()
             % pass = abs(len - 64.) < lenTol;
         end
         if pass
-            disp(accsLoc);
-            accs = [accs; accsLoc];
+            disp(accsSrc);
+            accs = [accs; accsSrc];
             accsMean = mean(accs, 1);
             times = [times; currTime];
             means = [means; accsMean];

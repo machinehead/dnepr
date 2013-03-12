@@ -18,10 +18,13 @@ function [] = serialLoop( fun )
         elseif strncmp(l, '!ANG,', 5)
             data = textscan(l, '!ANG,%f,%f,%f,GYRO,%d,%d,%d,ACC,%d,%d,%d,MAG,%f,%f,%f,%f\r\n',1);
             if size(data{1,13},1)
-                currTime = currTime + data{1,13};
+                timeDelta = data{1,13};
+                currTime = currTime + timeDelta;
                 angles = double([data{1,1:3}]);
+                gyro = double([data{1,4:6}]);
                 accs = double([data{1,7:9}]);
-                fun(angles,accs,currTime,offsetGyro,offsetAccel);
+                mag = double([data{1,10:12}]);
+                fun(angles, gyro, accs, mag, offsetGyro, offsetAccel, currTime, timeDelta);
             end
         end
     end

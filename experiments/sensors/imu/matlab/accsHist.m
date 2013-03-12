@@ -9,8 +9,8 @@ function [accs] = accsHist()
     
     tm1 = 0;
     
-    function [] = iter(anglesLoc, accsLoc, currTime, offsetGyro, offsetAccel)
-        accs = [accs; accsLoc];
+    function [] = iter(anglesAhrs, gyroSrc, accsSrc, magSrc, offsetGyro, offsetAccel, currTime, timeDelta)
+        accs = [accs; accsSrc];
 
         tm2 = currTime;
         if (tm2 - tm1 >= 0.5) 

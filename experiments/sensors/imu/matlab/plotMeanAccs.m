@@ -7,8 +7,8 @@ function [] = plotMeanAccs()
     f2 = figure();
     f3 = figure();
     
-    function [] = iter(anglesLoc, accsLoc, currTime, offsetGyro, offsetAccel)
-        accs = [accs; accsLoc];
+    function [] = iter(anglesAhrs, gyroSrc, accsSrc, magSrc, offsetGyro, offsetAccel, currTime, timeDelta)
+        accs = [accs; accsSrc];
         meanAccs = [meanAccs; mean(accs,1)];
         times = [times; currTime];
 

@@ -14,11 +14,11 @@ function [accs, vels, times] = plotAccsVelsCoords()
 
     tm1 = clock();
     
-    function [] = iter(anglesLoc, accsLoc, currTime, offsetGyro, offsetAccel)
+    function [] = iter(anglesAhrs, gyroSrc, accsSrc, magSrc, offsetGyro, offsetAccel, currTime, timeDelta)
         if currTime > 5
-            dcm = dcmd(anglesLoc);
-            angles = [angles; anglesLoc];
-            accsWorld = (dcm * ((accsLoc - offsetAccel) .* accGain)')' - [0. 0. 1024.];
+            dcm = dcmd(anglesAhrs);
+            angles = [angles; anglesAhrs];
+            accsWorld = (dcm * ((accsSrc - offsetAccel) .* accGain)')' - [0. 0. 1024.];
             accs = [accs; accsWorld];
 
             times = [times; currTime];
