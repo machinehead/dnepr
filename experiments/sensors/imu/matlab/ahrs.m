@@ -43,39 +43,16 @@ function [] = ahrs()
         end
         
         % DCM algorithm
-        gyroScaled = degtorad(gyroCorrLoc .* GYRO_GAIN);
-        Omega = gyroScaled + Omega_I + Omega_P;
-        
-        % Matrix update
-        Update_Matrix = [
-            0        -Omega(3)  Omega(2)
-            Omega(3) 0         -Omega(1)
-           -Omega(2) Omega(1)   0
-            ] * timeDelta;
-        
-        DCM_Matrix = DCM_Matrix + DCM_Matrix * Update_Matrix;
+        DCM_Matrix = matrixUpdate(gyroCorrLoc, Omega_I, Omega_P, timeDelta, DCM_Matrix);
         
         % Normalize
-        error = - DCM_Matrix(1, :) * DCM_Matrix(2, :)' .* 0.5;
-        temp = [
-            DCM_Matrix(2, :) .* error + DCM_Matrix(1, :); 
-            DCM_Matrix(1, :) .* error + DCM_Matrix(2, :)
-            ];
-        temp = [temp; cross(temp(1,:), temp(2, :))];
-        for i = 1:3
-            renorm = .5 * (3 - temp(i,:) * temp(i, :)');
-            DCM_Matrix(i,:) = temp(i, :) .* renorm;
-        end
+        DCM_Matrix = normalize(DCM_Matrix);
         
         % Drift correction
         
-        
         % Euler angles
+        [roll, pitch, yaw] = eulerAngles(DCM_Matrix);
         
-        pitch = -asin(DCM_Matrix(3,1));
-        roll = atan2(DCM_Matrix(3,2), DCM_Matrix(3,3));
-        yaw = atan2(DCM_Matrix(2,1), DCM_Matrix(1,1));
-
         times = [times; currTime];
         angDiffs = [angDiffs; [anglesAhrs radtodeg([roll pitch yaw])]];
         
@@ -107,6 +84,40 @@ function [] = ahrs()
         deg = rad * 180. / pi();
     end
 
+    function [roll, pitch, yaw] = eulerAngles(DCM_Matrix)
+        pitch = -asin(DCM_Matrix(3,1));
+        roll = atan2(DCM_Matrix(3,2), DCM_Matrix(3,3));
+        yaw = atan2(DCM_Matrix(2,1), DCM_Matrix(1,1));
+    end
+
+    function [dcm] = normalize(DCM_Matrix)
+        dcm = zeros(size(DCM_Matrix));
+        error = - DCM_Matrix(1, :) * DCM_Matrix(2, :)' .* 0.5;
+        temp = [
+            DCM_Matrix(2, :) .* error + DCM_Matrix(1, :); 
+            DCM_Matrix(1, :) .* error + DCM_Matrix(2, :)
+            ];
+        temp = [temp; cross(temp(1,:), temp(2, :))];
+        for i = 1:3
+            renorm = .5 * (3 - temp(i,:) * temp(i, :)');
+            dcm(i,:) = temp(i, :) .* renorm;
+        end
+    end
+
+    function [dcm] = matrixUpdate(gyroCorrLoc, Omega_I, Omega_P, timeDelta, DCM_Matrix)
+        gyroScaled = degtorad(gyroCorrLoc .* GYRO_GAIN);
+        Omega = gyroScaled + Omega_I + Omega_P;
+        
+        % Matrix update
+        Update_Matrix = [
+            0        -Omega(3)  Omega(2)
+            Omega(3) 0         -Omega(1)
+           -Omega(2) Omega(1)   0
+            ] * timeDelta;
+        
+        dcm = DCM_Matrix + DCM_Matrix * Update_Matrix;
+    end
+        
     serialLoop(@iter);
 
 end
