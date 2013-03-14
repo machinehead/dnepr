@@ -64,6 +64,7 @@ void Accel_Init()
   if (compass.getDeviceType() == LSM303DLHC_DEVICE)
   {
     compass.writeAccReg(LSM303_CTRL_REG1_A, 0x47); // normal power mode, all axes enabled, 50 Hz
+    // compass.writeAccReg(LSM303_CTRL_REG2_A, 0x88); // HPF enable at lowest freq, filtered data selected
     compass.writeAccReg(LSM303_CTRL_REG4_A, 0x08); // 2g scale, high resolution output mode
   }
   else 

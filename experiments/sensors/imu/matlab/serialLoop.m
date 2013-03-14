@@ -25,6 +25,8 @@ function [] = serialLoop( fun )
                 accs = double([data{1,7:9}]);
                 mag = double([data{1,10:12}]);
                 fun(angles, gyro, accs, mag, offsetGyro, offsetAccel, currTime, timeDelta);
+            else
+                disp('Skip reading!');
             end
         end
     end

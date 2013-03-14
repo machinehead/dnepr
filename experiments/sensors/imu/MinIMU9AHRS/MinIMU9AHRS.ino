@@ -85,7 +85,7 @@ int SENSOR_SIGN[9] = {1,1,1,-1,-1,-1,1,1,1}; //Correct directions x,y,z - gyro, 
 /*For debugging purposes*/
 //OUTPUTMODE=1 will print the corrected data, 
 //OUTPUTMODE=0 will print uncorrected data of the gyros (with drift)
-#define OUTPUTMODE 1
+#define OUTPUTMODE 0
 
 //#define PRINT_DCM 0     //Will print the whole direction cosine matrix
 #define PRINT_ANALOGS 1 //Will print the analog raw data
@@ -102,9 +102,9 @@ int AN[6]; //array that stores the gyro and accelerometer data
 float AN_OFFSET[6]={0,0,0,26.5,-4.5,-35}; //Array that stores the Offset of the sensors
 float ACC_GAIN[3]={1024./1005.5, 1024./1025.5, 1024./1042.};
 
-int gyro_x;
-int gyro_y;
-int gyro_z;
+float gyro_x;
+float gyro_y;
+float gyro_z;
 float accel_x;
 float accel_y;
 float accel_z;
