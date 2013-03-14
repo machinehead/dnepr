@@ -82,9 +82,9 @@ void Read_Accel()
   AN[3] = compass.a.x;
   AN[4] = compass.a.y;
   AN[5] = compass.a.z;
-  accel_x = (SENSOR_SIGN[3] * AN[3] - AN_OFFSET[3]) * ACC_GAIN[0];
-  accel_y = (SENSOR_SIGN[4] * AN[4] - AN_OFFSET[4]) * ACC_GAIN[1];
-  accel_z = (SENSOR_SIGN[5] * AN[5] - AN_OFFSET[5]) * ACC_GAIN[2];
+  accel_x = (SENSOR_SIGN[3] * AN[3] - AN_OFFSET[3]);
+  accel_y = (SENSOR_SIGN[4] * AN[4] - AN_OFFSET[4]);
+  accel_z = (SENSOR_SIGN[5] * AN[5] - AN_OFFSET[5]);
 }
 
 void Compass_Init()

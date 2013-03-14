@@ -72,11 +72,11 @@ void printdata(void)
       Serial.print (",");
       Serial.print(AN[5]*SENSOR_SIGN[5]);
       Serial.print(",MAG,");
-      Serial.print(c_magnetom_x);
+      Serial.print(magnetom_x);
       Serial.print (",");
-      Serial.print(c_magnetom_y);
+      Serial.print(magnetom_y);
       Serial.print (",");
-      Serial.print(c_magnetom_z);
+      Serial.print(magnetom_z);
       Serial.print (",");
       Serial.print(G_Dt,5);
       #endif
