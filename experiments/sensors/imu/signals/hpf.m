@@ -1,5 +1,6 @@
-function [ y ] = hpf( x, dt, rc )
+function [ y ] = hpf( x, dt, cutoff )
 %HPF Primitive high-pass filter
+    rc = 1 / (2 * pi() * cutoff);
     alpha = rc / (rc + dt);
     y = zeros(size(x));
     y(1) = x(1);
