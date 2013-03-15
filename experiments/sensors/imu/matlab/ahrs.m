@@ -1,10 +1,5 @@
-function [] = ahrs()
+function [] = ahrs(fun)
 %AHRS Matlab port of Arduino AHRS by Pololu.
-
-    % angle comparison plot data
-    times = [];
-    angDiffs = [];
-    f1 = figure();
 
     % accelerometer sensivity: +/-2g = +/- 2048
     GRAVITY = 1024;
@@ -18,6 +13,13 @@ function [] = ahrs()
     ACC_SIGN = SENSOR_SIGN(4:6);
     MAG_SIGN = SENSOR_SIGN(7:9);
 
+    ACC_MIN = [-1023   -1004.5  -1028.6];
+    ACC_MAX = [1052.7  1111     1095.1];
+    
+    offsetAccel = ACC_SIGN .* (ACC_MAX + ACC_MIN) * 0.5;
+    scaleAccel = [2048 2048 2048] ./ (ACC_MAX - ACC_MIN);
+    offsetGyro = [0 0 0];
+    
     % magnetometer calibration constants
     MAG_MIN = [-883 -942 -533];
     MAG_MAX = [320 481 452];
@@ -51,10 +53,9 @@ function [] = ahrs()
     % local_coord = DCM_Matrix' * world_coord;
     DCM_Matrix = eye(3);
     
-    tm1 = 0;
     counter = 0;
-    
-    function [] = iter(anglesAhrs, gyroSrc, accsSrc, magSrc, offsetGyro, offsetAccel, currTime, timeDelta)
+
+    function [] = iter(gyroSrc, accsSrc, magSrc, currTime, timeDelta)
         %ITER single iteration of data from sensor
         % anglesAhrs  - angles from Arduino AHRS system
         % gyroSrc     - raw gyro data from sensor
@@ -68,7 +69,7 @@ function [] = ahrs()
         
         % Data acquisition
         gyroCorrLoc = (GYRO_SIGN .* gyroSrc - offsetGyro);
-        accsCorrLoc = (ACC_SIGN .* accsSrc - offsetAccel);
+        accsCorrLoc = (ACC_SIGN .* accsSrc - offsetAccel) .* scaleAccel;
 
         counter = counter + 1;
         if counter > 5
@@ -90,14 +91,7 @@ function [] = ahrs()
         % Euler angles
         [roll, pitch, yaw] = eulerAngles(DCM_Matrix);
         
-        times = [times; currTime];
-        angDiffs = [angDiffs; [(anglesAhrs - radtodeg([roll pitch yaw]))]];
-        
-        tm2 = currTime;
-        if (tm2 - tm1 >= 0.5)
-            figure(f1);plot(times, angDiffs);
-            tm1 = tm2;
-        end
+        fun([roll pitch yaw], DCM_Matrix, accsCorrLoc, currTime, timeDelta);
     end
 
     function [heading] = magHeading(roll, pitch, magCorrLoc)
@@ -187,7 +181,7 @@ function [] = ahrs()
         Omega_I = Omega_I + errorYaw .* Ki_YAW;
     end
         
-    serialLoop(@iter);
+    serialLoopFast(@iter);
 
 end
 
