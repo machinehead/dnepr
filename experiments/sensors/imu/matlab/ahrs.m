@@ -13,8 +13,8 @@ function [] = ahrs(fun)
     ACC_SIGN = SENSOR_SIGN(4:6);
     MAG_SIGN = SENSOR_SIGN(7:9);
 
-    ACC_MIN = [-1023   -1004.5  -1028.6];
-    ACC_MAX = [1052.7  1111     1095.1];
+    ACC_MIN = [-1050  -991   -1006];
+    ACC_MAX = [1001   1054   1162];
     
     offsetAccel = ACC_SIGN .* (ACC_MAX + ACC_MIN) * 0.5;
     scaleAccel = [2048 2048 2048] ./ (ACC_MAX - ACC_MIN);

@@ -22,8 +22,8 @@ function [accs, vels, times] = plotAccsVelsCoords()
             accs = [accs; accsWorld];
 
             times = [times; currTime];
-            vels = cumsum(accs .* (9.81 / 1024.), 2) * 0.02;
-            coords = cumtrapz(vels, 1) * 0.02;
+            vels = cumsum(accs .* (9.81 / 1024.), 2) * timeStep;
+            coords = cumtrapz(vels, 1) * timeStep;
 
             tm2 = clock();
             if etime(tm2,tm1) >= 1

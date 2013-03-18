@@ -13,9 +13,14 @@ function [] = plotMeanAccs()
     f2 = figure();
     f3 = figure();
     
+    edges = -2048:2048;
+    
+    tm1 = 0;
+    
     function [] = iter(gyroSrc, accsSrc, magSrc, currTime, timeDelta)
         accs = [accs; accsSrc];
         % meanAccs = [meanAccs; mean(accs,1)];
+
         times = [times; currTime];
         mins = [mins; minAcc];
         maxs = [maxs; maxAcc];
@@ -23,8 +28,12 @@ function [] = plotMeanAccs()
         tm2 = currTime;
         if (tm2 - tm1 >= 0.5) 
             accFlt = lpf(accs, 0.02, 1);
-            minAcc = min(accFlt);
-            maxAcc = max(accFlt);
+            accFltHc = histc(accFlt, edges);
+            for i = 1:3
+                ind = find(accFltHc(:,i) > 4);
+                maxAcc(1,i) = max(edges(ind));
+                minAcc(1,i) = min(edges(ind));
+            end
             disp(minAcc);
             disp(maxAcc);
             figure(f1); plot(times, accs(:,1), 'b', times, accFlt(:,1), 'r', times, mins(:,1), 'g', times, maxs(:,1), 'g');
@@ -34,7 +43,6 @@ function [] = plotMeanAccs()
         end
     end
 
-    tm1 = 0;
-    serialLoop(@iter);
+    serialLoopFast(@iter);
 
 end
