@@ -1,15 +1,5 @@
-#if defined(MEGA)
-  #define UART_NUMBER 4
-#elif defined(PROMICRO)
-  #define UART_NUMBER 2
-#else
-  #define UART_NUMBER 1
-#endif
-#if defined(GPS_SERIAL)
-  #define RX_BUFFER_SIZE 256 // 256 RX buffer is needed for GPS communication (64 or 128 was too short)
-#else
-  #define RX_BUFFER_SIZE 64
-#endif
+#define UART_NUMBER 1
+#define RX_BUFFER_SIZE 64
 #define TX_BUFFER_SIZE 128
 #define INBUF_SIZE 64
 
@@ -21,6 +11,7 @@ static uint8_t inBuf[INBUF_SIZE][UART_NUMBER];
 
 #define BIND_CAPABLE 0;  //Used for Spektrum today; can be used in the future for any RX type that needs a bind and has a MultiWii module. 
 #if defined(SPEK_BIND)
+  ff
   #define BIND_CAPABLE 1;
 #endif
 // Capability is bit flags; next defines should be 2, 4, 8...

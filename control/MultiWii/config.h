@@ -31,7 +31,7 @@
     //#define BI
     //#define TRI
     //#define QUADP
-    //#define QUADX
+    #define QUADX
     //#define Y4
     //#define Y6
     //#define HEX6
@@ -151,6 +151,7 @@
       //#define WMP
       //#define ITG3200
       //#define L3G4200D
+      #define L3GD20
       //#define MPU6050       //combo + ACC
 
       /* I2C accelerometer */
@@ -162,6 +163,7 @@
       //#define NUNCHACK  // if you want to use the nunckuk as a standalone I2C ACC without WMP
       //#define LIS3LV02
       //#define LSM303DLx_ACC
+      #define LSM303DLHC_ACC
       //#define MMA8451Q
 
       /* I2C barometer */
@@ -206,14 +208,14 @@
     #define YAW_DIRECTION 1
     //#define YAW_DIRECTION -1 // if you want to reverse the yaw correction direction
     /* you can change the tricopter servo travel here */
-      #define TRI_YAW_CONSTRAINT_MIN 1020
-      #define TRI_YAW_CONSTRAINT_MAX 2000
-      #define TRI_YAW_MIDDLE 1500 // (*) tail servo center pos. - use this for initial trim; later trim midpoint via LCD
+      //#define TRI_YAW_CONSTRAINT_MIN 1020
+      //#define TRI_YAW_CONSTRAINT_MAX 2000
+      //#define TRI_YAW_MIDDLE 1500 // (*) tail servo center pos. - use this for initial trim; later trim midpoint via LCD
 
   /********************************    BI    *********************************/
     /* you can change the bicopter servo travel direction here */     
     //#define BI_PITCH_DIRECTION 1
-     #define BI_PITCH_DIRECTION -1
+     //#define BI_PITCH_DIRECTION -1
 
    /********************************    ARM/DISARM    *********************************/
    /* optionally disable stick combinations to arm/disarm the motors.
@@ -225,57 +227,57 @@
     /* The following lines apply only for a pitch/roll tilt stabilization system. Uncomment the first or second line to activate it */
     //#define SERVO_MIX_TILT
     //#define SERVO_TILT
-    #define TILT_PITCH_MIN    1020    //servo travel min, don't set it below 1020
-    #define TILT_PITCH_MAX    2000    //servo travel max, max value=2000
-    #define TILT_PITCH_MIDDLE 1500    //servo neutral value
-    #define TILT_PITCH_PROP   10      //servo proportional (tied to angle) ; can be negative to invert movement
-    #define TILT_PITCH_AUX_CH AUX3    //AUX channel to overwrite CAM pitch (AUX1-AUX4), comment to disable manual input and free the AUX channel
-    #define TILT_ROLL_MIN     1020
-    #define TILT_ROLL_MAX     2000
-    #define TILT_ROLL_MIDDLE  1500
-    #define TILT_ROLL_PROP    10
-    #define TILT_ROLL_AUX_CH  AUX4    //AUX channel to overwrite CAM Roll (AUX1-AUX4), comment to disable manual input and free the AUX channel
+    //#define TILT_PITCH_MIN    1020    //servo travel min, don't set it below 1020
+    //#define TILT_PITCH_MAX    2000    //servo travel max, max value=2000
+    //#define TILT_PITCH_MIDDLE 1500    //servo neutral value
+    //#define TILT_PITCH_PROP   10      //servo proportional (tied to angle) ; can be negative to invert movement
+    //#define TILT_PITCH_AUX_CH AUX3    //AUX channel to overwrite CAM pitch (AUX1-AUX4), comment to disable manual input and free the AUX channel
+    //#define TILT_ROLL_MIN     1020
+    //#define TILT_ROLL_MAX     2000
+    //#define TILT_ROLL_MIDDLE  1500
+    //#define TILT_ROLL_PROP    10
+    //#define TILT_ROLL_AUX_CH  AUX4    //AUX channel to overwrite CAM Roll (AUX1-AUX4), comment to disable manual input and free the AUX channel
 
     /* camera trigger function : activated via Rc Options in the GUI, servo output=A2 on promini */
     //#define CAMTRIG
-    #define CAM_SERVO_HIGH 2000  // the position of HIGH state servo
-    #define CAM_SERVO_LOW 1020   // the position of LOW state servo
-    #define CAM_TIME_HIGH 1000   // the duration of HIGH state servo expressed in ms
-    #define CAM_TIME_LOW 1000    // the duration of LOW state servo expressed in ms
+    //#define CAM_SERVO_HIGH 2000  // the position of HIGH state servo
+    //#define CAM_SERVO_LOW 1020   // the position of LOW state servo
+    //#define CAM_TIME_HIGH 1000   // the duration of HIGH state servo expressed in ms
+    //#define CAM_TIME_LOW 1000    // the duration of LOW state servo expressed in ms
 
   /***********************          Flying Wing                   ***********************/
     /* you can change change servo orientation and servo min/max values here
        valid for all flight modes, even passThrough mode
        need to setup servo directions here; no need to swap servos amongst channels at rx */
-    #define PITCH_DIRECTION_L 1 // left servo - pitch orientation
-    #define PITCH_DIRECTION_R -1  // right servo - pitch orientation (opposite sign to PITCH_DIRECTION_L, if servos are mounted in mirrored orientation)
-    #define ROLL_DIRECTION_L 1 // left servo - roll orientation
-    #define ROLL_DIRECTION_R 1  // right servo - roll orientation  (same sign as ROLL_DIRECTION_L, if servos are mounted in mirrored orientation)
-    #define WING_LEFT_MID  1500 // (*) left servo center pos. - use this for initial trim; later trim midpoint via LCD
-    #define WING_RIGHT_MID 1500 // (*) right servo center pos. - use this for initial trim; later trim midpoint via LCD
-    #define WING_LEFT_MIN  1020 // limit servo travel range must be inside [1020;2000]
-    #define WING_LEFT_MAX  2000 // limit servo travel range must be inside [1020;2000]
-    #define WING_RIGHT_MIN 1020 // limit servo travel range must be inside [1020;2000]
-    #define WING_RIGHT_MAX 2000 // limit servo travel range must be inside [1020;2000]
+    //#define PITCH_DIRECTION_L 1 // left servo - pitch orientation
+    //#define PITCH_DIRECTION_R -1  // right servo - pitch orientation (opposite sign to PITCH_DIRECTION_L, if servos are mounted in mirrored orientation)
+    //#define ROLL_DIRECTION_L 1 // left servo - roll orientation
+    //#define ROLL_DIRECTION_R 1  // right servo - roll orientation  (same sign as ROLL_DIRECTION_L, if servos are mounted in mirrored orientation)
+    //#define WING_LEFT_MID  1500 // (*) left servo center pos. - use this for initial trim; later trim midpoint via LCD
+    //#define WING_RIGHT_MID 1500 // (*) right servo center pos. - use this for initial trim; later trim midpoint via LCD
+    //#define WING_LEFT_MIN  1020 // limit servo travel range must be inside [1020;2000]
+    //#define WING_LEFT_MAX  2000 // limit servo travel range must be inside [1020;2000]
+    //#define WING_RIGHT_MIN 1020 // limit servo travel range must be inside [1020;2000]
+    //#define WING_RIGHT_MAX 2000 // limit servo travel range must be inside [1020;2000]
 
   /***********************          Airplane                       ***********************/
     //#define USE_THROTTLESERVO // For use of standard 50Hz servo on throttle.
-    #define SERVO_RATES      {100, 100, 100, 100, 100, 100, 100, 100} // Rates in 0-100%
-    #define SERVO_DIRECTION  { -1,   1,   1,   -1,  1,   1,   1,   1 } // Invert servos by setting -1
+    //#define SERVO_RATES      {100, 100, 100, 100, 100, 100, 100, 100} // Rates in 0-100%
+    //#define SERVO_DIRECTION  { -1,   1,   1,   -1,  1,   1,   1,   1 } // Invert servos by setting -1
 
     //#define FLAPPERONS    AUX4          // Mix Flaps with Aileroins.
-    #define FLAPPERON_EP   { 1500, 1700 } // Endpooints for flaps on a 2 way switch else set {1020,2000} and program in radio.
+    //#define FLAPPERON_EP   { 1500, 1700 } // Endpooints for flaps on a 2 way switch else set {1020,2000} and program in radio.
     //#define FLAPPERON_EP   { 1200, 1500 } // Or Flapperons up for CrowMix 
-    #define FLAPPERON_INVERT { 1, -1 }    // Change direction om flapperons { Wing1, Wing2 }
+    //#define FLAPPERON_INVERT { 1, -1 }    // Change direction om flapperons { Wing1, Wing2 }
     
     //#define FLAPS         AUX4          // Traditional Flaps on A2 invert with SERVO_DIRECTION servo[2).
-    #define FLAP_EP      { 1500, 1900 }   // Endpooints for flaps on a 2 way switch else set {1020,2000} and program in radio.
+    //#define FLAP_EP      { 1500, 1900 }   // Endpooints for flaps on a 2 way switch else set {1020,2000} and program in radio.
 
     //#define FLAPSPEED     3             // Make flaps move slowm Higher value is Higher Speed.
 
   /***********************      Common for Heli & Airplane         ***********************/
     //#define D12_POWER      // Use D12 on PROMINI to power sensors. Will disable servo[4] on D12
-    #define SERVO_OFFSET     {  0,   0,   0,  0,   0,   0,  0,   0 } // (*) Adjust Servo MID Offset & Swash angles
+    //#define SERVO_OFFSET     {  0,   0,   0,  0,   0,   0,  0,   0 } // (*) Adjust Servo MID Offset & Swash angles
     // Selectable channels:=    ROLL,PITCH,THROTTLE,YAW,AUX1,AUX2,AUX3,AUX4
 
     /* Governor: attempts to maintain rpm through pitch and voltage changes
@@ -289,28 +291,28 @@
 
   /***********************          Heli                           ***********************/
     /* Channel to control CollectivePitch */
-    #define COLLECTIVE_PITCH      THROTTLE
+    //#define COLLECTIVE_PITCH      THROTTLE
     /* Set Maximum available movement for the servos. Depending on model */
-    #define SERVO_ENDPOINT_HIGH {2000,2000,2000,2000,2000,2000,2000,2000};
-    #define SERVO_ENDPOINT_LOW  {1020,1020,1020,1020,1020,1020,1020,1020};
+    //#define SERVO_ENDPOINT_HIGH {2000,2000,2000,2000,2000,2000,2000,2000};
+    //#define SERVO_ENDPOINT_LOW  {1020,1020,1020,1020,1020,1020,1020,1020};
 
     /* Limit the range of Collective Pitch. 100% is Full Range each way and position for Zero Pitch */
-    #define COLLECTIVE_RANGE { 80, 0, 80 }// {Min%, ZeroPitch offset from 1500, Max%}.
-    #define YAW_CENTER             1500      // Use servo[5] SERVO_ENDPOINT_HIGH/LOW for the endpoits.
-    #define YAWMOTOR                 0       // If a motor is used as YAW Set to 1 else set to 0.
+    //#define COLLECTIVE_RANGE { 80, 0, 80 }// {Min%, ZeroPitch offset from 1500, Max%}.
+    //#define YAW_CENTER             1500      // Use servo[5] SERVO_ENDPOINT_HIGH/LOW for the endpoits.
+    //#define YAWMOTOR                 0       // If a motor is used as YAW Set to 1 else set to 0.
 
     /* Servo mixing for heli 120 Use 1/10 fractions (ex.5 = 5/10 = 1/2)
                          {Coll,Nick,Roll} */
-    #define SERVO_NICK   { +10, -10, -0 }
-    #define SERVO_LEFT   { +10, +5, +10 } 
-    #define SERVO_RIGHT  { +10, +5, -10 } 
+    //#define SERVO_NICK   { +10, -10, -0 }
+    //#define SERVO_LEFT   { +10, +5, +10 } 
+    //#define SERVO_RIGHT  { +10, +5, -10 } 
 
     /* Servo mixing for heli 90 
                             {Coll,Nick,Roll} */
-    #define SERVO_DIRECTIONS { +1, -1, -1 } // -1 will invert servo
+    //#define SERVO_DIRECTIONS { +1, -1, -1 } // -1 will invert servo
 
     /* Limit Maximum controll for Roll & Nick  in 0-100% */
-    #define CONTROL_RANGE   { 100, 100 }      //  { ROLL,PITCH }
+    //#define CONTROL_RANGE   { 100, 100 }      //  { ROLL,PITCH }
 
     /* use servo code to drive the throttle output. You want this for analog servo driving the throttle on IC engines.
        if inactive, throttle output will be treated as a motor output, so it can drive an ESC */
@@ -319,11 +321,11 @@
   /***********************      Single and DualCopter Settings     ***********************/
     /* Change to -1 to reverse servomovement per axis
        Servosettings for SingleCopter */
-    #define SINGLECOPTRER_YAW   {1, 1, 1, 1} // Left, Right,Front,Rear
-    #define SINGLECOPTRER_SERVO {1,-1, 1,-1} // Pitch,Pitch,Roll, Roll    
+    //#define SINGLECOPTRER_YAW   {1, 1, 1, 1} // Left, Right,Front,Rear
+    //#define SINGLECOPTRER_SERVO {1,-1, 1,-1} // Pitch,Pitch,Roll, Roll    
   
     /* Servosettings for DualCopter */
-     #define DUALCOPTER_SERVO {1,1} //Pitch,Roll
+     //#define DUALCOPTER_SERVO {1,1} //Pitch,Roll
     /* Use  SERVO_OFFSET and SERVO_RATES in Heli and Airplane section for centering and endpoints */
 
   /***********************      your individual mixing     ***********************/
@@ -555,7 +557,7 @@
 
   /************************        AP FlightMode        **********************************/
     /* Temporarily Disables GPS_HOLD_MODE to be able to make it possible to adjust the Hold-position when moving the sticks.*/
-    #define AP_MODE 40  // Create a deadspan for GPS.
+    //#define AP_MODE 40  // Create a deadspan for GPS.
         
   /************************   Assisted AcroTrainer    ************************************/
     /* Train Acro with auto recovery. Value set the point where ANGLE_MODE takes over.
@@ -645,7 +647,7 @@
        at least 5Hz update rate. uncomment the first line to select the GPS serial port of the arduino */
     //#define GPS_SERIAL 2 // should be 2 for flyduino v2. It's the serial port number on arduino MEGA
     //#define GPS_BAUD   57600
-    #define GPS_BAUD   115200
+    //#define GPS_BAUD   115200
 
 
    /* GPS protocol 
@@ -683,7 +685,7 @@
       - No GPS FIX -> LED blink at speed of incoming GPS frames
       - Fix and sat no. bellow 5 -> LED off
       - Fix and sat no. >= 5 -> LED blinks, one blink for 5 sat, two blinks for 6 sat, three for 7 ... */
-    #define GPS_LED_INDICATOR
+    //#define GPS_LED_INDICATOR
 
     //#define USE_MSP_WP                        //Enables the MSP_WP command, which is used by WinGUI to display and log Home and Poshold positions
 
@@ -691,22 +693,22 @@
 
     /* GPS navigation can control the heading */
     
-    #define NAV_CONTROLS_HEADING       true      // copter faces toward the navigation point, maghold must be enabled for it
-    #define NAV_TAIL_FIRST             false     // true - copter comes in with tail first 
-    #define NAV_SET_TAKEOFF_HEADING    true      // true - when copter arrives to home position it rotates it's head to takeoff direction
+    //#define NAV_CONTROLS_HEADING       true      // copter faces toward the navigation point, maghold must be enabled for it
+    //#define NAV_TAIL_FIRST             false     // true - copter comes in with tail first 
+    //#define NAV_SET_TAKEOFF_HEADING    true      // true - when copter arrives to home position it rotates it's head to takeoff direction
     
     
     /* Get your magnetic decliniation from here : http://magnetic-declination.com/
        Convert the degree+minutes into decimal degree by ==> degree+minutes*(1/60)
        Note the sign on declination it could be negative or positive (WEST or EAST) */
     //#define MAG_DECLINIATION  3.96f              //For Budapest Hungary.
-    #define MAG_DECLINIATION  0.0f
+    //#define MAG_DECLINIATION  0.0f
 
-    #define GPS_LEAD_FILTER                      // Adds a forward predictive filterig to compensate gps lag. Code based on Jason Short's lead filter implementation
+    //#define GPS_LEAD_FILTER                      // Adds a forward predictive filterig to compensate gps lag. Code based on Jason Short's lead filter implementation
     
     //#define GPS_FILTERING                        // add a 5 element moving average filter to GPS coordinates, helps eliminate gps noise but adds latency comment out to disable
-    #define GPS_WP_RADIUS              200       // if we are within this distance to a waypoint then we consider it reached (distance is in cm)
-    #define NAV_SLEW_RATE              30        // Adds a rate control to nav output, will smoothen out nav angle spikes
+    //#define GPS_WP_RADIUS              200       // if we are within this distance to a waypoint then we consider it reached (distance is in cm)
+    //#define NAV_SLEW_RATE              30        // Adds a rate control to nav output, will smoothen out nav angle spikes
 
 
   /**************************************************************************************/
@@ -721,7 +723,7 @@
       //#define LCD_SERIAL3W    // Alex' initial variant with 3 wires, using rx-pin for transmission @9600 baud fixed
       //#define LCD_TEXTSTAR    // SERIAL LCD: Cat's Whisker LCD_TEXTSTAR Module CW-LCD-02 (Which has 4 input keys for selecting menus)
       //#define LCD_VT100       // SERIAL LCD: vt100 compatible terminal emulation (blueterm, putty, etc.)
-      //#define LCD_TTY         // SERIAL LCD: useful to tweak parameters over cable with arduino IDE 'serial monitor'
+      #define LCD_TTY         // SERIAL LCD: useful to tweak parameters over cable with arduino IDE 'serial monitor'
       //#define LCD_ETPP        // I2C LCD: Eagle Tree Power Panel LCD, which is i2c (not serial)
       //#define LCD_LCD03       // I2C LCD: LCD03, which is i2c
       //#define OLED_I2C_128x64 // I2C LCD: OLED http://www.multiwii.com/forum/viewtopic.php?f=7&t=1350

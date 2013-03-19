@@ -77,7 +77,6 @@
   #define MEGA
 #endif
 
-
 /**************************************************************************************/
 /***************             motor and servo numbers               ********************/
 /**************************************************************************************/
@@ -1456,7 +1455,7 @@
 /***************              Sensor Type definitions              ********************/
 /**************************************************************************************/
 
-#if defined(ADXL345) || defined(BMA020) || defined(BMA180) || defined(NUNCHACK) || defined(MMA7455) || defined(ADCACC) || defined(LIS3LV02) || defined(LSM303DLx_ACC) || defined(MPU6050) || defined(MMA8451Q) || defined(NUNCHUCK)
+#if defined(ADXL345) || defined(BMA020) || defined(BMA180) || defined(NUNCHACK) || defined(MMA7455) || defined(ADCACC) || defined(LIS3LV02) || defined(LSM303DLx_ACC) || defined(LSM303DLHC_ACC) || defined(MPU6050) || defined(MMA8451Q) || defined(NUNCHUCK)
   #define ACC 1
 #else
   #define ACC 0
@@ -1468,7 +1467,7 @@
   #define MAG 0
 #endif
 
-#if defined(ITG3200) || defined(L3G4200D) || defined(MPU6050) || defined(MPU3050) || defined(WMP)
+#if defined(ITG3200) || defined(L3G4200D) || defined(L3GD20) || defined(MPU6050) || defined(MPU3050) || defined(WMP)
   #define GYRO 1
 #else
   #define GYRO 0
