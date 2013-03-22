@@ -1,6 +1,6 @@
 function [] = serialLoop( fun )
-% SERIALLOOP ÷икл чтени€ данных с IMU, выполн€ющий на каждой итерации
-% заданную функцию fun.
+% SERIALLOOP ÷икл чтени€ данных с IMU дл€ прошивки FastIMU,
+%   выполн€ющий на каждой итерации заданную функцию fun.
     port = serial('COM4','BaudRate',115200);
     port.Terminator = 'CR/LF';
     fopen(port);
@@ -15,17 +15,16 @@ function [] = serialLoop( fun )
             offsetAccel = double([data{1,4:6}]);
             disp(offsetGyro);
             disp(offsetAccel);
-        elseif strncmp(l, '!ANG,', 5)
-            data = textscan(l, '!ANG,%f,%f,%f,GYRO,%d,%d,%d,ACC,%d,%d,%d,MAG,%f,%f,%f,%f\r\n',1);
-            lastField = 13;
+        elseif strncmp(l, '!GYRO,', 6)
+            data = textscan(l, '!GYRO,%d,%d,%d,ACC,%d,%d,%d,MAG,%d,%d,%d,%f\r\n',1);
+            lastField = 10;
             if size(data{1,lastField},1)
                 timeDelta = data{1,lastField};
                 currTime = currTime + timeDelta;
-                angles = double([data{1,1:3}]);
-                gyro = double([data{1,4:6}]);
-                accs = double([data{1,7:9}]);
-                mag = double([data{1,10:12}]);
-                fun(angles, gyro, accs, mag, offsetGyro, offsetAccel, currTime, timeDelta);
+                gyro = double([data{1,1:3}]);
+                accs = double([data{1,4:6}]);
+                mag = double([data{1,7:9}]);
+                fun(gyro, accs, mag, currTime, timeDelta);
             else
                 disp('Skip reading!');
             end

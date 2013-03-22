@@ -4,7 +4,6 @@ function [accs, vels, times] = plotAccsVelsCoords()
     accs = [];
     vels = [];
     coords = [];
-    accGain = [1024./1005.5, 1024./1025.5, 1024./1042.];
     
     f1 = figure();
     f2 = figure();
@@ -14,16 +13,17 @@ function [accs, vels, times] = plotAccsVelsCoords()
 
     tm1 = clock();
     
-    function [] = iter(anglesAhrs, gyroSrc, accsSrc, magSrc, offsetGyro, offsetAccel, currTime, timeDelta)
+    timeStep = 0.02;
+    
+    function [] = iter(anglesAhrs, dcm, accsCorrLoc, currTime, timeDelta)
         if currTime > 5
-            dcm = dcmd(anglesAhrs);
             angles = [angles; anglesAhrs];
-            accsWorld = (dcm * ((accsSrc - offsetAccel) .* accGain)')' - [0. 0. 1024.];
+            accsWorld = (dcm * accsCorrLoc')' - [0. 0. 1024.];
             accs = [accs; accsWorld];
 
             times = [times; currTime];
-            vels = cumsum(accs .* (9.81 / 1024.), 2) * 0.02;
-            coords = cumtrapz(vels, 1) * 0.02;
+            vels = cumsum(accs .* (9.81 / 1024.), 2) * timeStep;
+            coords = cumtrapz(vels, 1) * timeStep;
 
             tm2 = clock();
             if etime(tm2,tm1) >= 1
@@ -36,6 +36,6 @@ function [accs, vels, times] = plotAccsVelsCoords()
         end
     end
 
-    serialLoop(@iter);
+    ahrs(@iter);
 
 end
