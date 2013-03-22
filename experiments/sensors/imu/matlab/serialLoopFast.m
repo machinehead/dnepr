@@ -7,8 +7,12 @@ function [] = serialLoopFast( fun )
     
     currTime = 0;
 
+    % filename = datestr(now, 'mmmm_dd_HH_MM_SS.txt');
+    % fid = fopen(filename, 'w');
+    
     while exist('runkey', 'file')
         l = fgetl(port);
+        % fprintf(fid, '%s\r\n', l);
         if strncmp(l, '!OFFSET,', 7)
             data = textscan(l, '!OFFSET,GYRO,%f,%f,%f,ACC,%f,%f,%f',1);
             offsetGyro = double([data{1,1:3}]);
@@ -37,5 +41,6 @@ function [] = serialLoopFast( fun )
     
     fclose(port);
     delete(port);
+    % fclose(fid);
 end
 
