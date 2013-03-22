@@ -13,16 +13,20 @@ function [] = ahrs(fun)
     ACC_SIGN = SENSOR_SIGN(4:6);
     MAG_SIGN = SENSOR_SIGN(7:9);
 
-    ACC_MIN = [-1050  -991   -1006];
-    ACC_MAX = [1001   1054   1162];
+    ACC_MIN = [-1071       -1034       -1022];
+    ACC_MAX = [1023        1047        1084];
     
     offsetAccel = ACC_SIGN .* (ACC_MAX + ACC_MIN) * 0.5;
     scaleAccel = [2048 2048 2048] ./ (ACC_MAX - ACC_MIN);
+    
     offsetGyro = [0 0 0];
     
+    gyroSum = [0 0 0];
+    gyroSumReadings = 0;
+    
     % magnetometer calibration constants
-    MAG_MIN = [-883 -942 -533];
-    MAG_MAX = [320 481 452];
+    MAG_MIN = [-543 -357 -441];
+    MAG_MAX = [495 458 531];
     
     % current angles relative to world coordinates, in degrees
     roll = 0;
@@ -55,7 +59,7 @@ function [] = ahrs(fun)
     
     counter = 0;
 
-    function [] = iter(gyroSrc, accsSrc, magSrc, currTime, timeDelta)
+    function [] = iter(gyroSrc, accsSrc, magSrc, currTime, timeDelta, sonar, sonarNew)
         %ITER single iteration of data from sensor
         % anglesAhrs  - angles from Arduino AHRS system
         % gyroSrc     - raw gyro data from sensor
@@ -67,12 +71,18 @@ function [] = ahrs(fun)
         %               moment
         % timeDelta   - time step of current iteration
         
+        if currTime < 5
+            gyroSum = gyroSum + gyroSrc;
+            gyroSumReadings = gyroSumReadings + 1;
+            offsetGyro = gyroSum ./ gyroSumReadings;
+        end
+        
         % Data acquisition
         gyroCorrLoc = (GYRO_SIGN .* gyroSrc - offsetGyro);
         accsCorrLoc = (ACC_SIGN .* accsSrc - offsetAccel) .* scaleAccel;
 
         counter = counter + 1;
-        if counter > 5
+        if counter > 10
             counter = 0;
             magCorrLoc = MAG_SIGN .* magSrc;
             % Calculate magnetometer heading
@@ -91,7 +101,7 @@ function [] = ahrs(fun)
         % Euler angles
         [roll, pitch, yaw] = eulerAngles(DCM_Matrix);
         
-        fun([roll pitch yaw], DCM_Matrix, accsCorrLoc, currTime, timeDelta);
+        fun(radtodeg([roll pitch yaw]), DCM_Matrix, accsCorrLoc, currTime, timeDelta, sonar, sonarNew);
     end
 
     function [heading] = magHeading(roll, pitch, magCorrLoc)

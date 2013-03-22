@@ -22,7 +22,12 @@ void printdata(void)
       Serial.print(AN[8]);
       Serial.print (",");
       Serial.print(G_Dt,5);
+      Serial.print (",");
+      Serial.print(sonarRange);
+      Serial.print (",");
+      Serial.print(sonarNew);
       Serial.println();    
+      sonarNew = 0;
 }
 
 
