@@ -1,4 +1,4 @@
-function [] = plotMeanAccs()
+function [] = plotMeanAccs(datasource)
     times = [];
     accs = [];
     % meanAccs = [];
@@ -17,7 +17,7 @@ function [] = plotMeanAccs()
     
     tm1 = 0;
     
-    function [] = iter(gyroSrc, accsSrc, magSrc, currTime, timeDelta)
+    function [] = iter(gyroSrc, accsSrc, magSrc, currTime, timeDelta, sonar, sonarNew)
         accs = [accs; accsSrc];
         % meanAccs = [meanAccs; mean(accs,1)];
 
@@ -43,6 +43,6 @@ function [] = plotMeanAccs()
         end
     end
 
-    serialLoopFast(@iter);
+    datasource(@iter);
 
 end

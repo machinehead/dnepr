@@ -31,6 +31,10 @@ with MinIMU-9-Arduino-AHRS. If not, see <http://www.gnu.org/licenses/>.
 #include <L3G.h>
 #include <LSM303.h>
 
+//The Arduino Wire library uses the 7-bit version of the address, so the code example uses 0x70 instead of the 8‑bit 0xE0
+#define SONAR_ADDRESS byte(0x70)
+#define SONAR_PING_COMMAND byte(0x51)
+
 L3G gyro;
 LSM303 compass;
 
@@ -51,7 +55,8 @@ void Accel_Init()
   compass.init();
   if (compass.getDeviceType() == LSM303DLHC_DEVICE)
   {
-    compass.writeAccReg(LSM303_CTRL_REG1_A, 0x47); // normal power mode, all axes enabled, 50 Hz
+    // compass.writeAccReg(LSM303_CTRL_REG1_A, 0x47); // normal power mode, all axes enabled, 50 Hz
+    compass.writeAccReg(LSM303_CTRL_REG1_A, 0x57); // normal power mode, all axes enabled, 100 Hz
     // compass.writeAccReg(LSM303_CTRL_REG2_A, 0x88); // HPF enable at lowest freq, filtered data selected
     compass.writeAccReg(LSM303_CTRL_REG4_A, 0x08); // 2g scale, high resolution output mode
   }
@@ -61,6 +66,11 @@ void Compass_Init()
 {
   compass.writeMagReg(LSM303_MR_REG_M, 0x00); // continuous conversion mode
   // 15 Hz default
+}
+
+void Sonar_Init()
+{
+  // nothing special
 }
 
 void Read_Gyro()
@@ -89,5 +99,23 @@ void Read_Compass()
   AN[6] = compass.m.x;
   AN[7] = compass.m.y;
   AN[8] = compass.m.z;
+}
+
+void Sonar_Ping()
+{
+  Wire.beginTransmission(SONAR_ADDRESS);
+  Wire.write(SONAR_PING_COMMAND);
+  Wire.endTransmission();
+}
+
+void Sonar_Read()
+{
+    Wire.requestFrom(SONAR_ADDRESS, byte(2));
+    if(Wire.available() >= 2) {           
+        byte HighByte = Wire.read();         
+        byte LowByte = Wire.read();          
+        sonarRange = word(HighByte, LowByte);
+        sonarNew = 1;
+    }
 }
 
