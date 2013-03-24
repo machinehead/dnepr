@@ -1,4 +1,4 @@
-function [] = ahrs(fun)
+function [] = ahrs(fun, datasource)
 %AHRS Matlab port of Arduino AHRS by Pololu.
 
     % accelerometer sensivity: +/-2g = +/- 2048
@@ -191,7 +191,7 @@ function [] = ahrs(fun)
         Omega_I = Omega_I + errorYaw .* Ki_YAW;
     end
         
-    serialLoopFast(@iter);
+    datasource(@iter);
 
 end
 

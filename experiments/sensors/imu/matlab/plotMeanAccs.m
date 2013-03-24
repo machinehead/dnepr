@@ -1,4 +1,4 @@
-function [] = plotMeanAccs()
+function [] = plotMeanAccs(datasource)
     times = [];
     accs = [];
     % meanAccs = [];
@@ -43,6 +43,6 @@ function [] = plotMeanAccs()
         end
     end
 
-    serialLoopFast(@iter);
+    datasource(@iter);
 
 end

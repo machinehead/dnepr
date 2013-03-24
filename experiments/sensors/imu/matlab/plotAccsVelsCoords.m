@@ -1,4 +1,4 @@
-function [] = plotAccsVelsCoords()
+function [] = plotAccsVelsCoords(datasource)
     times = [];
     % angles = [];
 
@@ -103,6 +103,6 @@ function [] = plotAccsVelsCoords()
         end
     end
 
-    ahrs(@iter);
+    ahrs(@iter, datasource);
 
 end
