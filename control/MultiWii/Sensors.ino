@@ -476,6 +476,30 @@ uint8_t Mag_getADC() { // return 1 when news values are available, 0 otherwise
 #endif
 
 // ************************************************************************************************************
+// I2C Compass LSM303DLHC_MAG
+// ************************************************************************************************************
+// I2C adress: 0x1E (7bit)
+// ************************************************************************************************************
+#if defined(LSM303DLHC_MAG)
+  #define MAG_ADDRESS 0x1E
+  #define MAG_DATA_REGISTER 0x03
+  #define MAG_CTRL_REG1 0x2
+  
+  void Mag_init() {
+    delay(100);
+    i2c_writeReg(MAG_ADDRESS,MAG_CTRL_REG1,0x00);  // continuous conversion mode
+    magInit = 1;
+  }
+  
+  void Device_Mag_getADC() {
+    i2c_getSixRawADC(MAG_ADDRESS,MAG_DATA_REGISTER);
+    MAG_ORIENTATION( ((rawADC[0]<<8) | rawADC[1]) ,          
+                     ((rawADC[2]<<8) | rawADC[3]) ,     
+                     ((rawADC[4]<<8) | rawADC[5]) );
+  }
+#endif
+
+// ************************************************************************************************************
 // I2C Compass MAG3110
 // ************************************************************************************************************
 // I2C adress: 0x0E (7bit)
