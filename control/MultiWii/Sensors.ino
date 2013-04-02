@@ -931,7 +931,7 @@ void tinygps_query(void) {
   #define SRF08_MAX_SENSORS    4        // maximum number of sensors we'll allow (can go up to 8)
 #endif
 
-#define SONAR_MULTICAST_PING
+// #define SONAR_MULTICAST_PING
 
 // registers of the device
 #define SRF08_REV_COMMAND    0
@@ -1024,7 +1024,9 @@ void i2c_srf08_discover() {
     x = i2c_try_readReg(SRF08_DEFAULT_ADDRESS, SRF08_REV_COMMAND);
     if(x!=0xffff) {
       // new sensor detected at SRF08 default address
-      i2c_srf08_change_addr(SRF08_DEFAULT_ADDRESS, addr);  // move sensor to the next address
+
+      // inekhay: Commented out for MB1242!!
+      // i2c_srf08_change_addr(SRF08_DEFAULT_ADDRESS, addr);  // move sensor to the next address
       srf08_ctx.sensors++;
     }
   }
@@ -1063,12 +1065,24 @@ void Sonar_update() {
 #else
     case 2:
       // send a ping to the current sensor
-      i2c_writeReg(SRF08_SENSOR_FIRST+(srf08_ctx.current<<1), SRF08_REV_COMMAND, 0x51);  // start ranging, result in centimeters
+
+      // inekhay: for MB1242 we don't change the address (so far!), and reading scheme is a bit different
+      // i2c_writeReg(SRF08_SENSOR_FIRST+(srf08_ctx.current<<1), SRF08_REV_COMMAND, 0x51);  // start ranging, result in centimeters
+      i2c_rep_start(SRF08_DEFAULT_ADDRESS<<1); // I2C write direction
+      i2c_write(0x51);        // value to write in register
+      i2c_stop();
+      
       srf08_ctx.state++;
       srf08_ctx.deadline += SRF08_RANGE_WAIT;
       break;
     case 3: 
-      srf08_ctx.range[srf08_ctx.current] = i2c_readReg16(SRF08_SENSOR_FIRST+(srf08_ctx.current<<1), SRF08_ECHO_RANGE);
+      // inekhay:
+      // srf08_ctx.range[srf08_ctx.current] = i2c_readReg16(SRF08_SENSOR_FIRST+(srf08_ctx.current<<1), SRF08_ECHO_RANGE);
+      
+        uint8_t b[2];
+        i2c_read_to_buf(SRF08_DEFAULT_ADDRESS, &b, sizeof(b));
+        srf08_ctx.range[srf08_ctx.current] = (b[0]<<8) | b[1];
+
       srf08_ctx.current++;
       if(srf08_ctx.current >= srf08_ctx.sensors)
         srf08_ctx.state=1;

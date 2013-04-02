@@ -184,7 +184,7 @@
 
       /* Sonar */ // for visualization purpose currently - no control code behind
       //#define SRF02 // use the Devantech SRF i2c sensors
-      //#define SRF08
+      #define SRF08
       //#define SRF10
       //#define SRF23
 
