@@ -175,7 +175,7 @@
       //#define HMC5883
       //#define AK8975
       //#define MAG3110
-      #define LSM303DLHC_MAG
+      //#define LSM303DLHC_MAG
       
       // Hope that these are correct orientation settings.
       #define ACC_ORIENTATION(X, Y, Z)  {accADC[ROLL]  = -X; accADC[PITCH]  = -Y; accADC[YAW]  = -Z;}
@@ -184,7 +184,7 @@
 
       /* Sonar */ // for visualization purpose currently - no control code behind
       //#define SRF02 // use the Devantech SRF i2c sensors
-      #define SRF08
+      //#define SRF08
       //#define SRF10
       //#define SRF23
 
