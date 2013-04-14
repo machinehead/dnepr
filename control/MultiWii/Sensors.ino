@@ -1110,7 +1110,20 @@ inline void Sonar_init() {}
 inline void Sonar_update() {}
 #endif
 
+#if defined(BARO)
+void  Baro_init() {
+}
 
+void Baro_Common() {
+}
+
+//return 0: no data available, no computation ;  1: new value available  ; 2: no new value, but computation time
+uint8_t Baro_update() {
+  if (srf08_ctx.deadline == currentTime)
+    return 0;
+  return 1;
+}
+#endif
 
 void initSensors() {
   delay(200);
@@ -1119,7 +1132,7 @@ void initSensors() {
   i2c_init();
   delay(100);
   if (GYRO) Gyro_init();
-  // if (BARO) Baro_init();
+  if (BARO) Baro_init();
   if (MAG) Mag_init();
   if (ACC) {ACC_init();acc_25deg = acc_1G * 0.423;}
   if (SONAR) Sonar_init();

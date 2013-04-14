@@ -1473,7 +1473,7 @@
   #define GYRO 0
 #endif
 
-#if defined(BMP085) || defined(MS561101BA)
+#if defined(BMP085) || defined(MS561101BA)  || defined(BARO)
   #define BARO 1
 #else
   #define BARO 0

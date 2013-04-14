@@ -260,4 +260,8 @@ void getEstimatedAttitude(){
     value += deadband;                  \
   }
 
-
+uint8_t getEstimatedAltitude()
+{
+  BaroAlt = EstAlt = sonarAlt;
+  return 1;
+}

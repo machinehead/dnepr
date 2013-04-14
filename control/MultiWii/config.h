@@ -169,22 +169,24 @@
       /* I2C barometer */
       //#define BMP085
       //#define MS561101BA
+      #define BARO 1
+      //#define SUPPRESS_BARO_ALTHOLD
 
       /* I2C magnetometer */
       //#define HMC5843
       //#define HMC5883
       //#define AK8975
       //#define MAG3110
-      //#define LSM303DLHC_MAG
+      #define LSM303DLHC_MAG
       
       // Hope that these are correct orientation settings.
-      #define ACC_ORIENTATION(X, Y, Z)  {accADC[ROLL]  = -X; accADC[PITCH]  = -Y; accADC[YAW]  = -Z;}
-      #define GYRO_ORIENTATION(X, Y, Z) {gyroADC[ROLL] = X; gyroADC[PITCH] = -Y; gyroADC[YAW] = Z;}
+      #define ACC_ORIENTATION(X, Y, Z)  {accADC[ROLL]  = Y; accADC[PITCH]  = -X; accADC[YAW]  = Z;}
+      #define GYRO_ORIENTATION(X, Y, Z) {gyroADC[ROLL] = X; gyroADC[PITCH] = Y; gyroADC[YAW] = -Z;}
 
 
       /* Sonar */ // for visualization purpose currently - no control code behind
       //#define SRF02 // use the Devantech SRF i2c sensors
-      //#define SRF08
+      #define SRF08
       //#define SRF10
       //#define SRF23
 
@@ -872,7 +874,7 @@
    * but if it's commented: Smooth alt change routine is activated, for slow auto and aerophoto modes (in general solution from alexmos). It's slowly increase/decrease 
    * altitude proportional to stick movement (+/-100 throttle gives about +/-50 cm in 1 second with cycle time about 3-4ms)
    */
-  #define ALTHOLD_FAST_THROTTLE_CHANGE
+  //#define ALTHOLD_FAST_THROTTLE_CHANGE
 
   /********************************************************************/
   /****           altitude variometer                              ****/
