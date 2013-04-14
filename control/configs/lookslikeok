@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>Thu Apr 04 18:42:38 GST 2013</comment>
+<comment>Wed Apr 10 21:33:30 GST 2013</comment>
 <entry key="pid.3.d">0.0</entry>
 <entry key="power.trigger">0</entry>
 <entry key="pid.2.i">0.0</entry>
@@ -9,16 +9,16 @@
 <entry key="rc.yaw.rate">0.0</entry>
 <entry key="pid.2.d">0.0</entry>
 <entry key="pid.9.p">0.0</entry>
-<entry key="pid.1.i">0.030000001</entry>
+<entry key="pid.1.i">0.051999975</entry>
 <entry key="pid.0.p">1.5</entry>
-<entry key="pid.1.d">23.0</entry>
+<entry key="pid.1.d">35.0</entry>
 <entry key="pid.9.i">0.0</entry>
 <entry key="pid.8.p">4.0</entry>
-<entry key="pid.0.i">0.03</entry>
+<entry key="pid.0.i">0.051</entry>
 <entry key="pid.9.d">0.0</entry>
-<entry key="pid.0.d">23.0</entry>
+<entry key="pid.0.d">35.0</entry>
 <entry key="pid.8.i">0.25</entry>
-<entry key="pid.7.p">9.0</entry>
+<entry key="pid.7.p">5.0</entry>
 <entry key="pid.8.d">100.0</entry>
 <entry key="rc.rate">0.9</entry>
 <entry key="rc.throttle.mid">0.5</entry>
@@ -35,9 +35,9 @@
 <entry key="pid.4.p">0.11</entry>
 <entry key="pid.5.d">0.045</entry>
 <entry key="pid.4.i">0.0</entry>
-<entry key="pid.3.p">0.0</entry>
+<entry key="pid.3.p">6.9999995</entry>
 <entry key="pid.4.d">0.0</entry>
-<entry key="pid.3.i">0.0</entry>
+<entry key="pid.3.i">0.015000001</entry>
 <entry key="rc.throttle.expo">0.0</entry>
 <entry key="pid.2.p">0.0</entry>
 </properties>
