@@ -43,6 +43,9 @@ String portnameFile="SerialPort.txt"; // Name of file for Autoconnect.
 int GUI_BaudRate = 115200; // Default.
 int SerialPort;
 
+String logFile = year() + "_" + month() + "_" + day() + "_" + hour() + "_" + minute() + "_" + second() + ".txt";
+PrintWriter logWriter;
+
 Serial g_serial;
 ControlP5 controlP5;
 Textlabel txtlblWhichcom; 
@@ -171,6 +174,8 @@ public controlP5.Controller hideLabel(controlP5.Controller c) {
 }
 
 public void setup() {
+  logWriter = createWriter(logFile);
+  
   size(windowsX,windowsY,OPENGL);
   frameRate(20); 
 
@@ -487,6 +492,8 @@ public void evaluateCommand(byte cmd, int dataSize) {
         if ((multiCapability&1)>0) {
           buttonRXbind = controlP5.addButton("bRXbind",1,10,yGraph+205-10,55,10); buttonRXbind.setColorBackground(blue_);buttonRXbind.setLabel("RX Bind");
         }
+        logWriter.println("IDENT;V;" + version + ";TYPE;" + multiType + "");
+        logWriter.flush();
         break;
     case MSP_STATUS:
         cycleTime = read16();
@@ -503,34 +510,59 @@ public void evaluateCommand(byte cmd, int dataSize) {
         }
         confSetting.setValue(read8());
         confSetting.setColorBackground(green_);
+        logWriter.println("STATUS;CYCLETIME;" + cycleTime + ";I2CERR;" + i2cError + ";PRESENT;" + present + ";MODE;" + mode);
+        logWriter.flush();
         break;
     case MSP_RAW_IMU:
         ax = read16();ay = read16();az = read16();
         gx = read16()/8;gy = read16()/8;gz = read16()/8;
-        magx = read16()/3;magy = read16()/3;magz = read16()/3; break;
+        magx = read16()/3;magy = read16()/3;magz = read16()/3; 
+        logWriter.println("RAW_IMU;AX;" + ax + ";AY;" + ay + ";AZ;" + az + ";GX;" + gx + ";GY;" + gy + ";GZ;" + gz + ";MAGX;" + magx + ";MAGY;" + magy + ";MAGZ;" + magz);
+        logWriter.flush();
+        break;
     case MSP_SERVO:
-        for(i=0;i<8;i++) servo[i] = read16(); break;
+        for(i=0;i<8;i++) servo[i] = read16(); 
+        break;
     case MSP_MOTOR:
-        for(i=0;i<8;i++) mot[i] = read16(); break;
+        logWriter.print("MOT;");
+        for(i=0;i<8;i++) {
+          mot[i] = read16(); 
+          logWriter.print(i + ";" + mot[i] + ";");
+        }
+        logWriter.println("");        
+        logWriter.flush();
+        break;
     case MSP_RC:
         rcRoll = read16();rcPitch = read16();rcYaw = read16();rcThrottle = read16();    
-        rcAUX1 = read16();rcAUX2 = read16();rcAUX3 = read16();rcAUX4 = read16(); break;
+        rcAUX1 = read16();rcAUX2 = read16();rcAUX3 = read16();rcAUX4 = read16(); 
+        logWriter.println("RC;ROLL;" + rcRoll + ";PITCH;" + rcPitch + ";YAW;" + rcYaw + ";THROTTLE;" + rcThrottle + ";AUX1;" + rcAUX1 + ";AUX2;" + rcAUX2 + ";AUX3;" + rcAUX3 + ";AUX4;" + rcAUX4);        
+        logWriter.flush();
+        break;
     case MSP_RAW_GPS:
         GPS_fix = read8();
         GPS_numSat = read8();
         GPS_latitude = read32();
         GPS_longitude = read32();
         GPS_altitude = read16();
-        GPS_speed = read16(); break;
+        GPS_speed = read16(); 
+        logWriter.println("GPS;ALT;" + GPS_altitude);        
+        logWriter.flush();
+        break;
     case MSP_COMP_GPS:
         GPS_distanceToHome = read16();
         GPS_directionToHome = read16();
         GPS_update = read8(); break;
     case MSP_ATTITUDE:
         angx = read16()/10;angy = read16()/10;
-        head = read16(); break;
+        head = read16(); 
+        logWriter.println("ATTITUDE;ANGX;" + angx + ";ANGY;" + angy + ";HEAD;" + head);        
+        logWriter.flush();
+        break;
     case MSP_ALTITUDE:
-        alt = read32(); break;
+        alt = read32(); 
+        logWriter.println("ALTITUDE;" + alt);        
+        logWriter.flush();
+        break;
     case MSP_BAT:
         bytevbat = read8();
         pMeterSum = read16(); break;
@@ -618,7 +650,10 @@ public void evaluateCommand(byte cmd, int dataSize) {
     case MSP_MOTOR_PINS:
         for( i=0;i<8;i++) {
           byteMP[i] = read8();
-        } break;
+        } 
+        logWriter.println("MSP_MOTOR_PINS");        
+        logWriter.flush();
+        break;
     case MSP_DEBUGMSG:
         while(dataSize-- > 0) {
           char c = (char)read8();
@@ -628,7 +663,10 @@ public void evaluateCommand(byte cmd, int dataSize) {
         }
         break;
     case MSP_DEBUG:
-        debug1 = read16();debug2 = read16();debug3 = read16();debug4 = read16(); break;
+        debug1 = read16();debug2 = read16();debug3 = read16();debug4 = read16(); 
+        logWriter.println("DEBUG;DEBUG1" + debug1 + ";DEBUG2;" + debug2 + ";DEBUG3;" + debug3 + ";DEBUG4;" + debug4);        
+        logWriter.flush();
+        break;
     default:
         //println("Don't know how to handle reply "+icmd);
   }
@@ -1927,6 +1965,6 @@ public void Tooltips(){
   controlP5.getTooltip().register("SETTING","Save Multiple settings.") ;
   }
   static public void main(String args[]) {
-    PApplet.main(new String[] { "--bgcolor=#ECE9D8", "MultiWiiConf" });
+    PApplet.main(new String[] { "--bgcolor=#F0F0F0", "MultiWiiConf" });
   }
 }
