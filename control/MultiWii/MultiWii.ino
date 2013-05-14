@@ -1256,19 +1256,19 @@ void loop () {
   #if BARO && (!defined(SUPPRESS_BARO_ALTHOLD))
     if (f.BARO_MODE) {
       static uint8_t isAltHoldChanged = 0;
-      #if defined(ALTHOLD_FAST_THROTTLE_CHANGE)
-        if (abs(rcCommand[THROTTLE]-initialThrottleHold) > ALT_HOLD_THROTTLE_NEUTRAL_ZONE) {
-          errorAltitudeI = 0;
-          isAltHoldChanged = 1;
-          rcCommand[THROTTLE] += (rcCommand[THROTTLE] > initialThrottleHold) ? -ALT_HOLD_THROTTLE_NEUTRAL_ZONE : ALT_HOLD_THROTTLE_NEUTRAL_ZONE;
-        } else {
-          if (isAltHoldChanged) {
-            AltHold = EstAlt;
-            isAltHoldChanged = 0;
-          }
-          rcCommand[THROTTLE] = initialThrottleHold + BaroPID;
-        }
-      #else
+//      #if defined(ALTHOLD_FAST_THROTTLE_CHANGE)
+//        if (abs(rcCommand[THROTTLE]-initialThrottleHold) > ALT_HOLD_THROTTLE_NEUTRAL_ZONE) {
+//          errorAltitudeI = 0;
+//          isAltHoldChanged = 1;
+//          rcCommand[THROTTLE] += (rcCommand[THROTTLE] > initialThrottleHold) ? -ALT_HOLD_THROTTLE_NEUTRAL_ZONE : ALT_HOLD_THROTTLE_NEUTRAL_ZONE;
+//        } else {
+//          if (isAltHoldChanged) {
+//            AltHold = EstAlt;
+//            isAltHoldChanged = 0;
+//          }
+//          rcCommand[THROTTLE] = initialThrottleHold + BaroPID;
+//        }
+//      #else
         static int16_t AltHoldCorr = 0;
         if (abs(rcCommand[THROTTLE]-initialThrottleHold)>ALT_HOLD_THROTTLE_NEUTRAL_ZONE) {
           // Slowly increase/decrease AltHold proportional to stick movement ( +100 throttle gives ~ +50 cm in 1 second with cycle time about 3-4ms)
@@ -1284,7 +1284,7 @@ void loop () {
           isAltHoldChanged = 0;
         }
         rcCommand[THROTTLE] = initialThrottleHold + BaroPID;
-      #endif
+//      #endif
     }
   #endif
   #if GPS
