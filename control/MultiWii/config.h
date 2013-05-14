@@ -887,7 +887,7 @@
      * method 1 : use short term movement from baro ( bigger code size)
      * method 2 : use long term observation of altitude from baro (smaller code size)
      */
-    //#define VARIOMETER 12            // possible values: 12 = methods 1 & 2 ; 1 = method 1 ; 2 = method 2
+    #define VARIOMETER 12            // possible values: 12 = methods 1 & 2 ; 1 = method 1 ; 2 = method 2
     //#define SUPPRESS_VARIOMETER_UP   // if no signaling for up movement is desired
     //#define SUPPRESS_VARIOMETER_DOWN // if no signaling for down movement is desired
     //#define VARIOMETER_SINGLE_TONE   // use only one tone (BEL); neccessary for non-patched vt100 terminals
