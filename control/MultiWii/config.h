@@ -394,7 +394,7 @@
       //#define SBUS
 
     /******************* RC signal from the serial port via Multiwii Serial Protocol *********/
-      #define RCSERIAL
+      //#define RCSERIAL
 
 
 
