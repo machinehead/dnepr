@@ -1006,19 +1006,20 @@ void i2c_srf08_discover() {
 
   // determine how many sensors are plugged in
   srf08_ctx.sensors=0;
-  addr = SRF08_SENSOR_FIRST;
-  for(int i=0; i<SRF08_MAX_SENSORS && x!=0xff; i++) {
+  // inekhay: commented out 'cause not needed 
+  // addr = SRF08_SENSOR_FIRST;
+  // for(int i=0; i<SRF08_MAX_SENSORS && x!=0xff; i++) {
     // read the revision as a way to check if sensor exists at this location
-    x = i2c_try_readReg(addr, SRF08_REV_COMMAND);
-    if(x!=0xffff) {
+    // x = i2c_try_readReg(addr, SRF08_REV_COMMAND);
+    // if(x!=0xffff) {
       // detected a sensor at this address
-      srf08_ctx.sensors++;
-      addr += 2;
-    }
-  }
+      // srf08_ctx.sensors++;
+      // addr += 2;
+    // }
+  // }
   
   // do not add sensors if we are already maxed
-  if(srf08_ctx.sensors < SRF08_MAX_SENSORS) {
+  // if(srf08_ctx.sensors < SRF08_MAX_SENSORS) {
     // now determine if any sensor is on the 'new sensor' address (srf08 default address)
     // we try to read the revision number
     x = i2c_try_readReg(SRF08_DEFAULT_ADDRESS, SRF08_REV_COMMAND);
@@ -1029,7 +1030,7 @@ void i2c_srf08_discover() {
       // i2c_srf08_change_addr(SRF08_DEFAULT_ADDRESS, addr);  // move sensor to the next address
       srf08_ctx.sensors++;
     }
-  }
+  // }
 }
 
 void Sonar_update() {
@@ -1039,7 +1040,8 @@ void Sonar_update() {
   switch (srf08_ctx.state) {
     case 0: 
       i2c_srf08_discover();
-      if(srf08_ctx.sensors>0)
+      // inekhay: changed "> 0" to "== 1" (assert that we have 1 sonar)
+      if(srf08_ctx.sensors==1)
         srf08_ctx.state++; 
       else
         srf08_ctx.deadline += 5000000; // wait 5 secs before trying search again
@@ -1091,7 +1093,7 @@ void Sonar_update() {
       break;
 #endif
   } 
-sonarAlt = srf08_ctx.range[0]; //tmp
+  sonarAlt = srf08_ctx.range[0]; //tmp
 }
 #elif defined(TINY_GPS_SONAR)
 inline void Sonar_init() {}
@@ -1119,9 +1121,7 @@ void Baro_Common() {
 
 //return 0: no data available, no computation ;  1: new value available  ; 2: no new value, but computation time
 uint8_t Baro_update() {
-  if (srf08_ctx.deadline == currentTime)
-    return 0;
-  return 1;
+  return 0;
 }
 #endif
 

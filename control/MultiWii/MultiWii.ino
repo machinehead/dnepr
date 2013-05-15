@@ -1177,19 +1177,19 @@ void loop () {
     switch (taskOrder) {
       case 0:
         taskOrder++;
-        #if MAG
-          if (Mag_getADC()) break; // max 350 µs (HMC5883) // only break when we actually did something
-        #endif
-      case 1:
-        taskOrder++;
-        #if BARO
-          if (Baro_update() != 0 ) break;
-        #endif
-      case 2:
-        taskOrder++;
         #if BARO
           if (getEstimatedAltitude() !=0) break;
         #endif    
+      case 1:
+        taskOrder++;
+        #if BARO
+          // if (Baro_update() != 0 ) break;
+        #endif
+      case 2:
+        taskOrder++;
+        #if MAG
+          if (Mag_getADC()) break; // max 350 µs (HMC5883) // only break when we actually did something
+        #endif
       case 3:
         taskOrder++;
         #if GPS
@@ -1199,7 +1199,7 @@ void loop () {
       case 4:
         taskOrder++;
         #if SONAR
-          Sonar_update();debug[2] = sonarAlt;
+          Sonar_update();//debug[2] = sonarAlt;
         #endif
         #ifdef LANDING_LIGHTS_DDR
           auto_switch_landing_lights();
@@ -1271,11 +1271,11 @@ void loop () {
 //      #else
         static int16_t AltHoldCorr = 0;
         if (abs(rcCommand[THROTTLE]-initialThrottleHold)>ALT_HOLD_THROTTLE_NEUTRAL_ZONE) {
-          // Slowly increase/decrease AltHold proportional to stick movement ( +100 throttle gives ~ +50 cm in 1 second with cycle time about 3-4ms)
+          // Slowly increase/decrease AltHold proportional to stick movement ( +100 throttle gives ~ +12.5 cm in 1 second with cycle time about 3-4ms)
           AltHoldCorr+= rcCommand[THROTTLE] - initialThrottleHold;
-          if(abs(AltHoldCorr) > 500) {
-            AltHold += AltHoldCorr/500;
-            AltHoldCorr %= 500;
+          if(abs(AltHoldCorr) > 2000) {
+            AltHold += AltHoldCorr/2000;
+            AltHoldCorr %= 2000;
           }
           errorAltitudeI = 0;
           isAltHoldChanged = 1;
