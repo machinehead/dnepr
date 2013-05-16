@@ -311,14 +311,9 @@ uint8_t getEstimatedAltitude()
  
     // projection of ACC vector to global Z, with 1G subtructed
     // Math: accZ = A * G / |G| - 1G
-    int16_t accZ = (accSmooth[ROLL] * EstG32.V.X + accSmooth[PITCH] * EstG32.V.Y + accSmooth[YAW] * EstG32.V.Z) * invG;
-
-    static int16_t accZoffset = 0; // = acc_1G*6; //58 bytes saved and convergence is fast enough to omit init
-    if (!f.ARMED) {
-      accZoffset -= accZoffset>>3;
-      accZoffset += accZ;
-    }  
-    accZ -= accZoffset>>3;
+	float invG = InvSqrt(isq(EstG.V.X) + isq(EstG.V.Y) + isq(EstG.V.Z));
+    int16_t accZ = (accLPFVel[ROLL] * EstG.V.X + accLPFVel[PITCH] * EstG.V.Y + accLPFVel[YAW] * EstG.V.Z) * invG - acc_1G; 
+    //int16_t accZ = (accLPFVel[ROLL] * EstG.V.X + accLPFVel[PITCH] * EstG.V.Y + accLPFVel[YAW] * EstG.V.Z) * invG - 1/invG; 
     applyDeadband(accZ, ACC_Z_DEADBAND);
 
     static float vel = 0.0f;
@@ -328,7 +323,7 @@ uint8_t getEstimatedAltitude()
     vel += accZ * accVelScale * dTime;
 
     static int32_t lastBaroAlt;
-    int16_t baroVel = (EstAlt - lastBaroAlt) * 1000000.0f / dTime;
+    float baroVel = (EstAlt - lastBaroAlt) * 1000000.0f / dTime;
     lastBaroAlt = EstAlt;
 
     baroVel = constrain(baroVel, -300, 300); // constrain baro velocity +/- 300cm/s
@@ -339,7 +334,7 @@ uint8_t getEstimatedAltitude()
     vel = vel * 0.985f + baroVel * 0.015f;
 
     //D
-    int16_t vel_tmp = vel;
+    int32_t vel_tmp = vel;
     applyDeadband(vel_tmp, 5);
     vario = vel_tmp;
     BaroPID -= constrain(conf.D8[PIDALT] * vel_tmp >>4, -150, 150);
