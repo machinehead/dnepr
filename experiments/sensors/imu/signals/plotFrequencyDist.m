@@ -9,6 +9,7 @@ function [] = plotFrequencyDist( samples, sampleFrequency )
     f = sampleFrequency/2*linspace(0,1,NFFT/2+1);
 
     % Plot single-sided amplitude spectrum.
+    figure();
     plot(f,2*abs(Y(1:NFFT/2+1))) 
     title('Single-Sided Amplitude Spectrum of y(t)')
     xlabel('Frequency (Hz)')
