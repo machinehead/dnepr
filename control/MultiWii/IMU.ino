@@ -89,7 +89,7 @@ void computeIMU () {
 /* Increasing this value would reduce ACC noise (visible in GUI), but would increase ACC lag time*/
 /* Comment this if  you do not want filter at all.*/
 #ifndef ACC_LPF_FACTOR
-  #define ACC_LPF_FACTOR 100
+  #define ACC_LPF_FACTOR 50
 #endif
 
 /* Set the Low Pass Filter factor for Magnetometer */

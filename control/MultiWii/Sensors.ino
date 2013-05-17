@@ -346,7 +346,7 @@ void ACC_init () {
 #define LSM303DLHC_ACC_ADDRESS 0x19
 void ACC_init () {
   delay(10);
-  i2c_writeReg(LSM303DLHC_ACC_ADDRESS,0x20,0x47); // REG1_A, normal power mode, 50 Hz, all axis enable
+  i2c_writeReg(LSM303DLHC_ACC_ADDRESS,0x20,0x77); // REG1_A, normal power mode, 50 Hz, all axis enable
   i2c_writeReg(LSM303DLHC_ACC_ADDRESS,0x23,0x20); // REG4_A, scale +/- 8G
   i2c_writeReg(LSM303DLHC_ACC_ADDRESS,0x21,0x00); // REG2_A, filter off
 
