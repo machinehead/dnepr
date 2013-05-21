@@ -924,7 +924,8 @@ void tinygps_query(void) {
 #endif
 
 #if !defined(SRF08_SENSOR_FIRST) 
-  #define SRF08_SENSOR_FIRST    0xF0    // the first sensor i2c address (after it has been moved)
+  #define SRF08_SENSOR_FIRST    0x70      // inekhay: 7-bit now!
+                                          // the first sensor i2c address (after it has been moved)
 #endif
 
 #if !defined(SRF08_MAX_SENSORS) 
@@ -985,6 +986,7 @@ uint16_t i2c_readReg16(int8_t addr, int8_t reg) {
   return (b[0]<<8) | b[1];
 }
 
+/*
 void i2c_srf08_change_addr(int8_t current, int8_t moveto) {
   // to change a srf08 address, we must write the following sequence to the command register
   // this sequence must occur as 4 seperate i2c transactions!!
@@ -998,6 +1000,7 @@ void i2c_srf08_change_addr(int8_t current, int8_t moveto) {
    alarmArray[7] = 2;
   #endif
 }
+*/
 
 // discover previously known sensors and any new sensor (move new sensors to assigned area)
 void i2c_srf08_discover() {
@@ -1005,7 +1008,7 @@ void i2c_srf08_discover() {
   uint16_t x;
 
   // determine how many sensors are plugged in
-  srf08_ctx.sensors=0;
+  srf08_ctx.sensors=2;
   // inekhay: commented out 'cause not needed 
   // addr = SRF08_SENSOR_FIRST;
   // for(int i=0; i<SRF08_MAX_SENSORS && x!=0xff; i++) {
@@ -1022,14 +1025,14 @@ void i2c_srf08_discover() {
   // if(srf08_ctx.sensors < SRF08_MAX_SENSORS) {
     // now determine if any sensor is on the 'new sensor' address (srf08 default address)
     // we try to read the revision number
-    x = i2c_try_readReg(SRF08_DEFAULT_ADDRESS, SRF08_REV_COMMAND);
-    if(x!=0xffff) {
+    // x = i2c_try_readReg(SRF08_DEFAULT_ADDRESS, SRF08_REV_COMMAND);
+    // if(x!=0xffff) {
       // new sensor detected at SRF08 default address
 
       // inekhay: Commented out for MB1242!!
       // i2c_srf08_change_addr(SRF08_DEFAULT_ADDRESS, addr);  // move sensor to the next address
-      srf08_ctx.sensors++;
-    }
+      // srf08_ctx.sensors++;
+    // }
   // }
 }
 
@@ -1040,8 +1043,7 @@ void Sonar_update() {
   switch (srf08_ctx.state) {
     case 0: 
       i2c_srf08_discover();
-      // inekhay: changed "> 0" to "== 1" (assert that we have 1 sonar)
-      if(srf08_ctx.sensors==1)
+      if(srf08_ctx.sensors > 0)
         srf08_ctx.state++; 
       else
         srf08_ctx.deadline += 5000000; // wait 5 secs before trying search again
@@ -1051,6 +1053,7 @@ void Sonar_update() {
       srf08_ctx.state++;
       srf08_ctx.deadline += SRF08_RANGE_SLEEP;
       break;
+/*
 #if defined(SONAR_MULTICAST_PING)
     case 2:
       // send a ping via the general broadcast address
@@ -1059,19 +1062,19 @@ void Sonar_update() {
       srf08_ctx.deadline += SRF08_RANGE_WAIT;
       break;
     case 3: 
-      srf08_ctx.range[srf08_ctx.current] = i2c_readReg16( SRF08_SENSOR_FIRST+(srf08_ctx.current<<1), SRF08_ECHO_RANGE);
+      srf08_ctx.range[srf08_ctx.current] = i2c_readReg16(SRF08_SENSOR_FIRST+(srf08_ctx.current<<1), SRF08_ECHO_RANGE);
       srf08_ctx.current++;
       if(srf08_ctx.current >= srf08_ctx.sensors)
         srf08_ctx.state=1;
       break;
 #else
+*/
     case 2:
       // send a ping to the current sensor
 
-      // inekhay: for MB1242 we don't change the address (so far!), and reading scheme is a bit different
-      // i2c_writeReg(SRF08_SENSOR_FIRST+(srf08_ctx.current<<1), SRF08_REV_COMMAND, 0x51);  // start ranging, result in centimeters
-      i2c_rep_start(SRF08_DEFAULT_ADDRESS<<1); // I2C write direction
-      i2c_write(0x51);        // value to write in register
+      // inekhay: we'll have 3 MB1242s with changed addresses
+      i2c_rep_start((SRF08_SENSOR_FIRST + srf08_ctx.current) << 1); // I2C write direction, 
+      i2c_write(0x51);        // start ranging, result in centimeters
       i2c_stop();
       
       srf08_ctx.state++;
@@ -1082,7 +1085,7 @@ void Sonar_update() {
       // srf08_ctx.range[srf08_ctx.current] = i2c_readReg16(SRF08_SENSOR_FIRST+(srf08_ctx.current<<1), SRF08_ECHO_RANGE);
       
         uint8_t b[2];
-        i2c_read_to_buf(SRF08_DEFAULT_ADDRESS, &b, sizeof(b));
+        i2c_read_to_buf((SRF08_SENSOR_FIRST + srf08_ctx.current), &b, sizeof(b));
         srf08_ctx.range[srf08_ctx.current] = (b[0]<<8) | b[1];
 
       srf08_ctx.current++;
@@ -1091,9 +1094,13 @@ void Sonar_update() {
       else
         srf08_ctx.state=2; 
       break;
-#endif
+// #endif
   } 
   sonarAlt = srf08_ctx.range[0]; //tmp
+
+  debug[0] = srf08_ctx.range[0];
+  debug[1] = srf08_ctx.range[1];
+  debug[2] = srf08_ctx.range[2];  
 }
 #elif defined(TINY_GPS_SONAR)
 inline void Sonar_init() {}

@@ -301,13 +301,13 @@ uint8_t getEstimatedAltitude()
     int16_t error16 = constrain(AltHold - EstAlt, -300, 300);
     applyDeadband(error16, 10); //remove small P parametr to reduce noise near zero position
     BaroPID = constrain((conf.P8[PIDALT] * error16 >>7), -150, +150);
-    debug[1] = BaroPID;
+    // debug[1] = BaroPID;
 
     //I
     errorAltitudeI += conf.I8[PIDALT] * error16 >>6;
     errorAltitudeI = constrain(errorAltitudeI,-30000,30000);
     BaroPID += errorAltitudeI>>9; //I in range +/-60
-    debug[2] = errorAltitudeI>>9;
+    // debug[2] = errorAltitudeI>>9;
  
     // projection of ACC vector to global Z, with 1G subtructed
     // Math: accZ = A * G / |G| - 1G
@@ -338,9 +338,9 @@ uint8_t getEstimatedAltitude()
     applyDeadband(vel_tmp, 5);
     vario = vel_tmp;
     BaroPID -= constrain(conf.D8[PIDALT] * vel_tmp >>4, -150, 150);
-    debug[3] = constrain(conf.D8[PIDALT] * vel_tmp >>4, -150, 150);
+    // debug[3] = constrain(conf.D8[PIDALT] * vel_tmp >>4, -150, 150);
   #endif
-  debug[0] = AltHold;
+  // debug[0] = AltHold;
   return 1;
 }
 #endif //BARO
