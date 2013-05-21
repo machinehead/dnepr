@@ -1008,7 +1008,7 @@ void i2c_srf08_discover() {
   uint16_t x;
 
   // determine how many sensors are plugged in
-  srf08_ctx.sensors=2;
+  srf08_ctx.sensors=3;
   // inekhay: commented out 'cause not needed 
   // addr = SRF08_SENSOR_FIRST;
   // for(int i=0; i<SRF08_MAX_SENSORS && x!=0xff; i++) {
