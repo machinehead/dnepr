@@ -517,7 +517,7 @@ public void evaluateCommand(byte cmd, int dataSize) {
         GPS_longitude = read32();
         GPS_altitude = read16();
         GPS_speed = read16(); 
-        logWriter.println("GPS;ALT;" + GPS_altitude);        
+        logWriter.println("GPS;ALT;" + GPS_altitude + ";LAT;" + GPS_latitude + ";LON;" + GPS_longitude + ";SPD;" + GPS_speed);        
         logWriter.flush();
         break;
     case MSP_COMP_GPS:
