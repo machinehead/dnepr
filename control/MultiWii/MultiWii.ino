@@ -234,7 +234,25 @@ static int16_t  vario = 0;              // variometer in cm/s
 #endif
 
 static int16_t  debug[4];
+
+/* SONAR variables */ 
+
+#if !defined(SRF08_MAX_SENSORS) 
+  #define SRF08_MAX_SENSORS    4        // maximum number of sensors we'll allow (can go up to 8)
+#endif
+
+static struct {
+  // sensor registers from the MS561101BA datasheet
+  int32_t  range[SRF08_MAX_SENSORS];
+  int8_t   sensors;              // the number of sensors present
+  int8_t   current;              // the current sensor being read
+  uint8_t  state;
+  uint32_t deadline;
+} srf08_ctx;
+
 static int16_t  sonarAlt; //to think about the unit
+
+
 
 struct flags_struct {
   uint8_t OK_TO_ARM :1 ;
@@ -1259,8 +1277,12 @@ void loop () {
         GPS_angle[ROLL]   = (nav_rated[LON]*cos_yaw_x - nav_rated[LAT]*sin_yaw_y) /10;
         GPS_angle[PITCH]  = (nav_rated[LON]*sin_yaw_y + nav_rated[LAT]*cos_yaw_x) /10;
       #else 
-        GPS_angle[ROLL]   = (nav[LON]*cos_yaw_x - nav[LAT]*sin_yaw_y) /10;
+		/*
+		GPS_angle[ROLL]   = (nav[LON]*cos_yaw_x - nav[LAT]*sin_yaw_y) /10;
         GPS_angle[PITCH]  = (nav[LON]*sin_yaw_y + nav[LAT]*cos_yaw_x) /10;
+		*/
+		GPS_angle[ROLL]   = nav[LAT] /10;
+        GPS_angle[PITCH]  = nav[LON] /10;
       #endif
     } else {
       GPS_angle[ROLL]  = 0;

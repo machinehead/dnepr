@@ -928,27 +928,12 @@ void tinygps_query(void) {
                                           // the first sensor i2c address (after it has been moved)
 #endif
 
-#if !defined(SRF08_MAX_SENSORS) 
-  #define SRF08_MAX_SENSORS    4        // maximum number of sensors we'll allow (can go up to 8)
-#endif
-
 // #define SONAR_MULTICAST_PING
 
 // registers of the device
 #define SRF08_REV_COMMAND    0
 #define SRF08_LIGHT_GAIN     1
 #define SRF08_ECHO_RANGE     2
-
-
-static struct {
-  // sensor registers from the MS561101BA datasheet
-  int32_t  range[SRF08_MAX_SENSORS];
-  int8_t   sensors;              // the number of sensors present
-  int8_t   current;              // the current sensor being read
-  uint8_t  state;
-  uint32_t deadline;
-} srf08_ctx;
-
 
 // read uncompensated temperature value: send command first
 void Sonar_init() {

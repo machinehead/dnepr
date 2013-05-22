@@ -104,6 +104,9 @@ void GPS_NewData() {
   GPS_distance_cm_bearing(&GPS_coord[LAT],&GPS_coord[LON],&GPS_home[LAT],&GPS_home[LON],&dist,&dir);
   GPS_distanceToHome = dist/100;
   GPS_directionToHome = dir/100;
+  
+  GPS_coord[LON] = srf08_ctx.range[1]; // X, forward
+  GPS_coord[LAT] = srf08_ctx.range[2]; // Y, left/right
 
   if (!f.GPS_FIX_HOME) {     //If we don't have home set, do not display anything
      GPS_distanceToHome = 0;
@@ -160,22 +163,11 @@ int32_t wrap_18000(int32_t ang) {
 // Get bearing from pos1 to pos2, returns an 1deg = 100 precision
 void GPS_distance_cm_bearing(int32_t* lat1, int32_t* lon1, int32_t* lat2, int32_t* lon2,uint32_t* dist, int32_t* bearing) {
   float dLat = *lat2 - *lat1;                                    // difference of latitude in 1/10 000 000 degrees
-  float dLon = (float)(*lon2 - *lon1);
+  float dLon = *lon2 - *lon1;
   *dist = sqrt(sq(dLat) + sq(dLon));
   
   *bearing = 9000.0f + atan2(-dLat, dLon) * 5729.57795f;      //Convert the output redians to 100xdeg
   if (*bearing < 0) *bearing += 36000;
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-// keep old calculation function for compatibility (could be removed later) distance in meters, bearing in degree 
-//
-void GPS_distance(int32_t lat1, int32_t lon1, int32_t lat2, int32_t lon2, uint16_t* dist, int16_t* bearing) {
-  uint32_t d1;
-  int32_t  d2;
-  GPS_distance_cm_bearing(&lat1,&lon1,&lat2,&lon2,&d1,&d2);
-  *dist = d1 / 100;          //convert to meters
-  *bearing = d2 /  100;      //convert to degrees
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
