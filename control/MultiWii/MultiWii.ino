@@ -244,6 +244,7 @@ static int16_t  debug[4];
 static struct {
   // sensor registers from the MS561101BA datasheet
   int32_t  range[SRF08_MAX_SENSORS];
+  int32_t  readAt[SRF08_MAX_SENSORS]; // timestamp when each of the sensors was read
   int8_t   sensors;              // the number of sensors present
   int8_t   current;              // the current sensor being read
   uint8_t  state;
@@ -1136,14 +1137,21 @@ void loop () {
       }
     #endif
     
+    static uint8_t GPSNavReset = 1;
     if (rcOptions[BOXGPSHOLD] && abs(rcCommand[ROLL])< AP_MODE && abs(rcCommand[PITCH]) < AP_MODE) {
       if (!f.GPS_HOLD_MODE) {
         f.GPS_HOLD_MODE = 1;
+        GPSNavReset = 0;
 
         nav_mode = NAV_MODE_POSHOLD;
       }
     } else {
       f.GPS_HOLD_MODE = 0;
+
+      if (GPSNavReset == 0 ) {
+        GPSNavReset = 1;
+        GPS_reset_nav();
+      }
    }
     
     #if defined(FIXEDWING) || defined(HELICOPTER)
@@ -1277,17 +1285,19 @@ void loop () {
         GPS_angle[ROLL]   = (nav_rated[LON]*cos_yaw_x - nav_rated[LAT]*sin_yaw_y) /10;
         GPS_angle[PITCH]  = (nav_rated[LON]*sin_yaw_y + nav_rated[LAT]*cos_yaw_x) /10;
       #else 
-		/*
-		GPS_angle[ROLL]   = (nav[LON]*cos_yaw_x - nav[LAT]*sin_yaw_y) /10;
+        /*
+        GPS_angle[ROLL]   = (nav[LON]*cos_yaw_x - nav[LAT]*sin_yaw_y) /10;
         GPS_angle[PITCH]  = (nav[LON]*sin_yaw_y + nav[LAT]*cos_yaw_x) /10;
-		*/
-		GPS_angle[ROLL]   = nav[LAT] /10;
+        */
+        GPS_angle[ROLL]   = nav[LAT] /10;
         GPS_angle[PITCH]  = nav[LON] /10;
       #endif
     } else {
       GPS_angle[ROLL]  = 0;
       GPS_angle[PITCH] = 0;
     }
+    // debug[0] = nav[LON];
+    // debug[1] = nav[LAT];
   #endif
 
   //**** PITCH & ROLL & YAW PID ****

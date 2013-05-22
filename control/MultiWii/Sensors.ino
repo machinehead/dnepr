@@ -916,11 +916,11 @@ void tinygps_query(void) {
 #endif
 
 #if !defined(SRF08_RANGE_WAIT) 
-  #define SRF08_RANGE_WAIT     80000      // delay between Ping and Range Read commands
+  #define SRF08_RANGE_WAIT     100000      // delay between Ping and Range Read commands
 #endif
 
 #if !defined(SRF08_RANGE_SLEEP) 
-  #define SRF08_RANGE_SLEEP    35000      // sleep this long before starting another Ping
+  #define SRF08_RANGE_SLEEP    1      // sleep this long before starting another Ping
 #endif
 
 #if !defined(SRF08_SENSOR_FIRST) 
@@ -1072,6 +1072,7 @@ void Sonar_update() {
         uint8_t b[2];
         i2c_read_to_buf((SRF08_SENSOR_FIRST + srf08_ctx.current), &b, sizeof(b));
         srf08_ctx.range[srf08_ctx.current] = (b[0]<<8) | b[1];
+        srf08_ctx.readAt[srf08_ctx.current] = currentTime;
 
       srf08_ctx.current++;
       if(srf08_ctx.current >= srf08_ctx.sensors)
@@ -1083,9 +1084,9 @@ void Sonar_update() {
   } 
   sonarAlt = srf08_ctx.range[0]; //tmp
 
-  debug[0] = srf08_ctx.range[0];
-  debug[1] = srf08_ctx.range[1];
-  debug[2] = srf08_ctx.range[2];  
+  // debug[0] = srf08_ctx.range[0];
+  // debug[1] = srf08_ctx.range[1];
+  // debug[2] = srf08_ctx.range[2];  
 }
 #elif defined(TINY_GPS_SONAR)
 inline void Sonar_init() {}

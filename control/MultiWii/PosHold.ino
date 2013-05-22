@@ -73,6 +73,11 @@ static int16_t rate_error[2];
 static int32_t error[2];
 
 void GPS_NewData() {
+  static int32_t sonarTimestamp[2] = {0,0};
+  if(srf08_ctx.readAt[1] <= sonarTimestamp[0] || srf08_ctx.readAt[2] <= sonarTimestamp[1]) return; // sonars haven't been updated
+  sonarTimestamp[0] = srf08_ctx.readAt[1];
+  sonarTimestamp[1] = srf08_ctx.readAt[2];
+  
   uint8_t axis;
 
   static uint8_t GPS_pids_initialized;
@@ -102,7 +107,7 @@ void GPS_NewData() {
   uint32_t dist;
   int32_t  dir;
   GPS_distance_cm_bearing(&GPS_coord[LAT],&GPS_coord[LON],&GPS_home[LAT],&GPS_home[LON],&dist,&dir);
-  GPS_distanceToHome = dist/100;
+  GPS_distanceToHome = dist;
   GPS_directionToHome = dir/100;
   
   GPS_coord[LON] = srf08_ctx.range[1]; // X, forward
@@ -132,6 +137,20 @@ void GPS_reset_home_position() {
     GPS_home[LON] = GPS_coord[LON];
     //Set ground altitude
     f.GPS_FIX_HOME = 1;
+}
+
+//reset navigation (stop the navigation processor, and clear nav)
+void GPS_reset_nav() {
+  uint8_t i;
+  
+  for(i=0;i<2;i++) {
+    GPS_angle[i] = 0;
+    nav_rated[i] = 0;
+    nav[i] = 0;
+    reset_PID(&posholdPID[i]);
+    reset_PID(&poshold_ratePID[i]);
+    reset_PID(&navPID[i]);
+  }
 }
 
 //Get the relevant P I D values and set the PID controllers 
@@ -191,6 +210,7 @@ static void GPS_calc_velocity(){
     speed_old[_X] = actual_speed[_X];
     speed_old[_Y] = actual_speed[_Y];
   }
+  GPS_speed = sqrt(sq(actual_speed[_X]) + sq(actual_speed[_Y]));
   init=1;
 
   last[LON] = GPS_coord[LON];
@@ -225,16 +245,31 @@ static void GPS_calc_poshold() {
     target_speed = constrain(target_speed,-NAV_SPEED_MAX,NAV_SPEED_MAX);
     rate_error[axis] = target_speed - actual_speed[axis]; // calc the speed error
 
+    int32_t p = get_P(rate_error[axis],                                               &poshold_ratePID_PARAM);
+    int32_t i = get_I(rate_error[axis] + error[axis], &dTnav, &poshold_ratePID[axis], &poshold_ratePID_PARAM);
+    d = get_D(error[axis],                    &dTnav, &poshold_ratePID[axis], &poshold_ratePID_PARAM);
+
+    if(axis == _Y) {
+      debug[0] = p;
+      debug[1] = i;
+      debug[2] = d;
+    }
+    
+    /*
     nav[axis]      =
         get_P(rate_error[axis],                                               &poshold_ratePID_PARAM)
        +get_I(rate_error[axis] + error[axis], &dTnav, &poshold_ratePID[axis], &poshold_ratePID_PARAM);
     d = get_D(error[axis],                    &dTnav, &poshold_ratePID[axis], &poshold_ratePID_PARAM);
+    */
 
+    nav[axis] = p + i;
     d = constrain(d, -2000, 2000);
     // get rid of noise
+/*    
     #if defined(GPS_LOW_SPEED_D_FILTER)
       if(abs(actual_speed[axis]) < 50) d = 0;
     #endif
+*/
 
     nav[axis] +=d;
     nav[axis]  = constrain(nav[axis], -NAV_BANK_MAX, NAV_BANK_MAX);
