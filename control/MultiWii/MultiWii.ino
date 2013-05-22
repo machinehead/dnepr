@@ -1118,53 +1118,15 @@ void loop () {
       }
     #endif
     
-    #if GPS
-      static uint8_t GPSNavReset = 1;
-      if (f.GPS_FIX && GPS_numSat >= 5 ) {
-        if (rcOptions[BOXGPSHOME]) {  // if both GPS_HOME & GPS_HOLD are checked => GPS_HOME is the priority
-          if (!f.GPS_HOME_MODE)  {
-            f.GPS_HOME_MODE = 1;
-            f.GPS_HOLD_MODE = 0;
-            GPSNavReset = 0;
-            #if defined(I2C_GPS)
-              GPS_I2C_command(I2C_GPS_COMMAND_START_NAV,0);        //waypoint zero
-            #else // SERIAL
-              GPS_set_next_wp(&GPS_home[LAT],&GPS_home[LON]);
-              nav_mode    = NAV_MODE_WP;
-            #endif
-          }
-        } else {
-          f.GPS_HOME_MODE = 0;
-          if (rcOptions[BOXGPSHOLD] && abs(rcCommand[ROLL])< AP_MODE && abs(rcCommand[PITCH]) < AP_MODE) {
-            if (!f.GPS_HOLD_MODE) {
-              f.GPS_HOLD_MODE = 1;
-              GPSNavReset = 0;
-              #if defined(I2C_GPS)
-                GPS_I2C_command(I2C_GPS_COMMAND_POSHOLD,0);
-              #else
-                GPS_hold[LAT] = GPS_coord[LAT];
-                GPS_hold[LON] = GPS_coord[LON];
-                GPS_set_next_wp(&GPS_hold[LAT],&GPS_hold[LON]);
-                nav_mode = NAV_MODE_POSHOLD;
-              #endif
-            }
-          } else {
-            f.GPS_HOLD_MODE = 0;
-            // both boxes are unselected here, nav is reset if not already done
-            if (GPSNavReset == 0 ) {
-              GPSNavReset = 1;
-              GPS_reset_nav();
-            }
-          }
-        }
-      } else {
-        f.GPS_HOME_MODE = 0;
-        f.GPS_HOLD_MODE = 0;
-        #if !defined(I2C_GPS)
-          nav_mode = NAV_MODE_NONE;
-        #endif
+    if (rcOptions[BOXGPSHOLD] && abs(rcCommand[ROLL])< AP_MODE && abs(rcCommand[PITCH]) < AP_MODE) {
+      if (!f.GPS_HOLD_MODE) {
+        f.GPS_HOLD_MODE = 1;
+
+        nav_mode = NAV_MODE_POSHOLD;
       }
-    #endif
+    } else {
+      f.GPS_HOLD_MODE = 0;
+   }
     
     #if defined(FIXEDWING) || defined(HELICOPTER)
       if (rcOptions[BOXPASSTHRU]) {f.PASSTHRU_MODE = 1;}
@@ -1193,7 +1155,7 @@ void loop () {
       case 3:
         taskOrder++;
         #if GPS
-          if(GPS_Enable) GPS_NewData();
+          /* if(GPS_Enable) */ GPS_NewData();
           break;
         #endif
       case 4:

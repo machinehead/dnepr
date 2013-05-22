@@ -565,7 +565,7 @@
 
   /************************        AP FlightMode        **********************************/
     /* Temporarily Disables GPS_HOLD_MODE to be able to make it possible to adjust the Hold-position when moving the sticks.*/
-    //#define AP_MODE 40  // Create a deadspan for GPS.
+    #define AP_MODE 40  // Create a deadspan for GPS.
         
   /************************   Assisted AcroTrainer    ************************************/
     /* Train Acro with auto recovery. Value set the point where ANGLE_MODE takes over.
@@ -648,6 +648,8 @@
   /***********************                  GPS                **************************/
   /**************************************************************************************/
 
+    #define GPS 1
+    
     /* GPS using a SERIAL port
        if enabled, define here the Arduino Serial port number and the UART speed
        note: only the RX PIN is used in case of NMEA mode, the GPS is not configured by multiwii
