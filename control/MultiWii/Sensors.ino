@@ -1069,10 +1069,13 @@ void Sonar_update() {
       // inekhay:
       // srf08_ctx.range[srf08_ctx.current] = i2c_readReg16(SRF08_SENSOR_FIRST+(srf08_ctx.current<<1), SRF08_ECHO_RANGE);
       
-        uint8_t b[2];
-        i2c_read_to_buf((SRF08_SENSOR_FIRST + srf08_ctx.current), &b, sizeof(b));
-        srf08_ctx.range[srf08_ctx.current] = (b[0]<<8) | b[1];
+      uint8_t b[2];
+      i2c_read_to_buf((SRF08_SENSOR_FIRST + srf08_ctx.current), &b, sizeof(b));
+      int32_t range = (b[0]<<8) | b[1];
+      if( srf08_ctx.current == 0 || (range > 23 && range < 765) ) {
+        srf08_ctx.range[srf08_ctx.current] = range;
         srf08_ctx.readAt[srf08_ctx.current] = currentTime;
+      }
 
       srf08_ctx.current++;
       if(srf08_ctx.current >= srf08_ctx.sensors)

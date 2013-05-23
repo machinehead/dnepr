@@ -62,7 +62,7 @@ void reset_PID(struct PID_* pid) {
 #define _Y 0
 
 #define NAV_SPEED_MAX              20    // cm/sec
-#define NAV_BANK_MAX               1000  // 30deg max banking when navigating (just for security and testing)
+#define NAV_BANK_MAX               500  // 5deg max banking when navigating (just for security and testing)
 
 static float  dTnav;            // Delta Time in milliseconds for navigation computations, updated with every good GPS read
 static int16_t actual_speed[2] = {0,0};
@@ -249,10 +249,13 @@ static void GPS_calc_poshold() {
     int32_t i = get_I(rate_error[axis] + error[axis], &dTnav, &poshold_ratePID[axis], &poshold_ratePID_PARAM);
     d = get_D(error[axis],                    &dTnav, &poshold_ratePID[axis], &poshold_ratePID_PARAM);
 
-    if(axis == _Y) {
+    if(axis == _X) {
       debug[0] = p;
-      debug[1] = i;
-      debug[2] = d;
+      debug[1] = d;
+    }
+    else if(axis == _Y) {
+      debug[2] = p;
+      debug[3] = d;
     }
     
     /*
