@@ -16,6 +16,7 @@ function [times, raw_accel, raw_gyro, raw_mag, motors, rc_rpyts, auxes, alts, de
     motor = [0 0 0 0];
     rc_rpyt = [0 0 0 0];
     aux = [0 0 0 0];
+    gps = [0 0 0 0];
     
     fid = fopen(filename);
     currTimeUS = 0;

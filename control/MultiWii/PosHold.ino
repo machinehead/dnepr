@@ -182,7 +182,7 @@ int32_t wrap_18000(int32_t ang) {
 // Get bearing from pos1 to pos2, returns an 1deg = 100 precision
 void GPS_distance_cm_bearing(int32_t* lat1, int32_t* lon1, int32_t* lat2, int32_t* lon2,uint32_t* dist, int32_t* bearing) {
   float dLat = *lat2 - *lat1;                                    // difference of latitude in 1/10 000 000 degrees
-  float dLon = *lon2 - *lon1;
+  float dLon = -(*lon2 - *lon1);
   *dist = sqrt(sq(dLat) + sq(dLon));
   
   *bearing = 9000.0f + atan2(-dLat, dLon) * 5729.57795f;      //Convert the output redians to 100xdeg
@@ -201,7 +201,7 @@ static void GPS_calc_velocity(){
 
   if (init) {
     float tmp = 1.0/dTnav;
-    actual_speed[_X] = (float)(GPS_coord[LON] - last[LON]) * tmp;
+    actual_speed[_X] = -(float)(GPS_coord[LON] - last[LON]) * tmp;
     actual_speed[_Y] = (float)(GPS_coord[LAT]  - last[LAT])  * tmp;
   
     actual_speed[_X] = (actual_speed[_X] + speed_old[_X]) / 2;
@@ -228,7 +228,7 @@ static void GPS_calc_velocity(){
 //
 static void GPS_calc_location_error( int32_t* target_lat, int32_t* target_lng, int32_t* gps_lat, int32_t* gps_lng ) 
 {
-  error[LON] = (float)(*target_lng - *gps_lng);  // X Error
+  error[LON] = -(*target_lng - *gps_lng);  // X Error
   error[LAT] = *target_lat - *gps_lat; // Y Error
 }
 
