@@ -1,4 +1,4 @@
-function [times, raw_accel, raw_gyro, raw_mag, motors, rc_rpyts, auxes, alts, debugs, imu_rpys] = readLog( filename )
+function [times, raw_accel, raw_gyro, raw_mag, motors, rc_rpyts, auxes, alts, debugs, imu_rpys, gpss] = readLog( filename )
 %READLOG Read the log of a MultiWiiConf run.
 % invoke: [t,ra,rg,rm,m,rpyt,aux,alt,dbg,rpy] = readLog('2013_4_30_14_59_20.txt');
     times = [];
@@ -11,6 +11,7 @@ function [times, raw_accel, raw_gyro, raw_mag, motors, rc_rpyts, auxes, alts, de
     alts = [];
     debugs = [];
     imu_rpys = [];
+    gpss = [];
 
     motor = [0 0 0 0];
     rc_rpyt = [0 0 0 0];
@@ -33,6 +34,7 @@ function [times, raw_accel, raw_gyro, raw_mag, motors, rc_rpyts, auxes, alts, de
                 alts = [alts; alt];
                 debugs = [debugs; dbg];
                 imu_rpys = [imu_rpys; imu_rpy];
+                gpss = [gpss; gps];
             end
             
             data = textscan(tline, 'STATUS;CYCLETIME;%d;I2CERR;%d;PRESENT;%d;MODE;%d', 1, 'ReturnOnError', false);
@@ -59,6 +61,9 @@ function [times, raw_accel, raw_gyro, raw_mag, motors, rc_rpyts, auxes, alts, de
         elseif strncmp(tline, 'ATTITUDE;', 6)
             data = textscan(tline, 'ATTITUDE;ANGX;%f;ANGY;%f;HEAD;%f', 1, 'ReturnOnError', false);
             imu_rpy = double([data{1,1:3}]);
+        elseif strncmp(tline, 'GPS;', 4)
+            data = textscan(tline, 'GPS;ALT;%f;LAT;%f;LON;%f;SPD;%f', 1, 'ReturnOnError', false);
+            gps = double([data{1,1:4}]);
         end
         
         tline = fgetl(fid);
