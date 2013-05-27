@@ -648,7 +648,7 @@
   /***********************                  GPS                **************************/
   /**************************************************************************************/
 
-    #define GPS 1
+    // #define GPS 1
     
     /* GPS using a SERIAL port
        if enabled, define here the Arduino Serial port number and the UART speed

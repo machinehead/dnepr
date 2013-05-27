@@ -282,6 +282,10 @@ void getEstimatedAttitude(){
     value += deadband;                  \
   }
 
+#define BARO_PID_P_THROT_CONSTRAIN (150)
+#define BARO_PID_I_THROT_CONSTRAIN (150)
+#define BARO_PID_D_THROT_CONSTRAIN (150)
+
 #if BARO
 uint8_t getEstimatedAltitude() 
 {
@@ -299,15 +303,16 @@ uint8_t getEstimatedAltitude()
   #if (defined(VARIOMETER) && (VARIOMETER != 2)) || !defined(SUPPRESS_BARO_ALTHOLD)
     //P
     int16_t error16 = constrain(AltHold - EstAlt, -300, 300);
-    applyDeadband(error16, 10); //remove small P parametr to reduce noise near zero position
-    BaroPID = constrain((conf.P8[PIDALT] * error16 >>7), -150, +150);
-    // debug[1] = BaroPID;
+    // inekhay: deadband of 10 cm is too high, we don't need it.
+    // applyDeadband(error16, 10); //remove small P parametr to reduce noise near zero position
+    BaroPID = constrain((conf.P8[PIDALT] * error16 >>7), -BARO_PID_P_THROT_CONSTRAIN, +BARO_PID_P_THROT_CONSTRAIN);
+    debug[1] = BaroPID;
 
     //I
     errorAltitudeI += conf.I8[PIDALT] * error16 >>6;
-    errorAltitudeI = constrain(errorAltitudeI,-30000,30000);
-    BaroPID += errorAltitudeI>>9; //I in range +/-60
-    // debug[2] = errorAltitudeI>>9;
+    errorAltitudeI = constrain(errorAltitudeI,-(BARO_PID_I_THROT_CONSTRAIN << 9),(BARO_PID_I_THROT_CONSTRAIN << 9));
+    BaroPID += errorAltitudeI>>9; //I in range +/-BARO_PID_I_THROT_CONSTRAIN
+    debug[2] = errorAltitudeI>>9;
  
     // projection of ACC vector to global Z, with 1G subtructed
     // Math: accZ = A * G / |G| - 1G
@@ -327,7 +332,7 @@ uint8_t getEstimatedAltitude()
     lastBaroAlt = EstAlt;
 
     baroVel = constrain(baroVel, -300, 300); // constrain baro velocity +/- 300cm/s
-    applyDeadband(baroVel, 10); // to reduce noise near zero
+    // applyDeadband(baroVel, 10); // to reduce noise near zero
 
     // apply Complimentary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity). 
     // By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
@@ -337,10 +342,10 @@ uint8_t getEstimatedAltitude()
     int32_t vel_tmp = vel;
     applyDeadband(vel_tmp, 5);
     vario = vel_tmp;
-    BaroPID -= constrain(conf.D8[PIDALT] * vel_tmp >>4, -150, 150);
-    // debug[3] = constrain(conf.D8[PIDALT] * vel_tmp >>4, -150, 150);
+    BaroPID -= constrain(conf.D8[PIDALT] * vel_tmp >>4, -BARO_PID_D_THROT_CONSTRAIN, BARO_PID_D_THROT_CONSTRAIN);
+    debug[3] = constrain(conf.D8[PIDALT] * vel_tmp >>4, -BARO_PID_D_THROT_CONSTRAIN, BARO_PID_D_THROT_CONSTRAIN);
   #endif
-  // debug[0] = AltHold;
+  debug[0] = AltHold;
   return 1;
 }
 #endif //BARO

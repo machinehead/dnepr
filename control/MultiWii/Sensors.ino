@@ -993,7 +993,7 @@ void i2c_srf08_discover() {
   uint16_t x;
 
   // determine how many sensors are plugged in
-  srf08_ctx.sensors=3;
+  srf08_ctx.sensors=1;
   // inekhay: commented out 'cause not needed 
   // addr = SRF08_SENSOR_FIRST;
   // for(int i=0; i<SRF08_MAX_SENSORS && x!=0xff; i++) {
@@ -1072,10 +1072,10 @@ void Sonar_update() {
       uint8_t b[2];
       i2c_read_to_buf((SRF08_SENSOR_FIRST + srf08_ctx.current), &b, sizeof(b));
       int32_t range = (b[0]<<8) | b[1];
-      if( srf08_ctx.current == 0 || (range > 23 && range < 765) ) {
-        srf08_ctx.range[srf08_ctx.current] = range;
-        srf08_ctx.readAt[srf08_ctx.current] = currentTime;
-      }
+      // if( srf08_ctx.current == 0 || (range > 23 && range < 765) ) {
+      //  srf08_ctx.range[srf08_ctx.current] = range;
+      //  srf08_ctx.readAt[srf08_ctx.current] = currentTime;
+      // }
 
       srf08_ctx.current++;
       if(srf08_ctx.current >= srf08_ctx.sensors)

@@ -1097,7 +1097,7 @@ void loop () {
         if (rcOptions[BOXBARO]) {
             if (!f.BARO_MODE) {
               f.BARO_MODE = 1;
-              AltHold = EstAlt;
+              AltHold = 50;
               initialThrottleHold = rcCommand[THROTTLE];
               errorAltitudeI = 0;
               BaroPID=0;
@@ -1136,7 +1136,8 @@ void loop () {
         headFreeModeHold = heading; // acquire new heading
       }
     #endif
-    
+
+#if GPS    
     static uint8_t GPSNavReset = 1;
     if (rcOptions[BOXGPSHOLD] && abs(rcCommand[ROLL])< AP_MODE && abs(rcCommand[PITCH]) < AP_MODE) {
       if (!f.GPS_HOLD_MODE) {
@@ -1153,6 +1154,7 @@ void loop () {
         GPS_reset_nav();
       }
    }
+#endif
     
     #if defined(FIXEDWING) || defined(HELICOPTER)
       if (rcOptions[BOXPASSTHRU]) {f.PASSTHRU_MODE = 1;}
@@ -1243,7 +1245,7 @@ void loop () {
 
   #if BARO && (!defined(SUPPRESS_BARO_ALTHOLD))
     if (f.BARO_MODE) {
-      static uint8_t isAltHoldChanged = 0;
+//      static uint8_t isAltHoldChanged = 0;
 //      #if defined(ALTHOLD_FAST_THROTTLE_CHANGE)
 //        if (abs(rcCommand[THROTTLE]-initialThrottleHold) > ALT_HOLD_THROTTLE_NEUTRAL_ZONE) {
 //          errorAltitudeI = 0;
@@ -1257,21 +1259,36 @@ void loop () {
 //          rcCommand[THROTTLE] = initialThrottleHold + BaroPID;
 //        }
 //      #else
-        static int16_t AltHoldCorr = 0;
-        if (abs(rcCommand[THROTTLE]-initialThrottleHold)>ALT_HOLD_THROTTLE_NEUTRAL_ZONE) {
+//        static int16_t AltHoldCorr = 0;
+//        if (abs(rcCommand[THROTTLE]-initialThrottleHold)>ALT_HOLD_THROTTLE_NEUTRAL_ZONE) {
           // Slowly increase/decrease AltHold proportional to stick movement ( +100 throttle gives ~ +12.5 cm in 1 second with cycle time about 3-4ms)
-          AltHoldCorr+= rcCommand[THROTTLE] - initialThrottleHold;
-          if(abs(AltHoldCorr) > 2000) {
-            AltHold += AltHoldCorr/2000;
-            AltHoldCorr %= 2000;
-          }
-          errorAltitudeI = 0;
-          isAltHoldChanged = 1;
-        } else if (isAltHoldChanged) {
-          AltHold = EstAlt;
-          isAltHoldChanged = 0;
+//          AltHoldCorr+= rcCommand[THROTTLE] - initialThrottleHold;
+//          if(abs(AltHoldCorr) > 2000) {
+//            AltHold += AltHoldCorr/2000;
+//            AltHoldCorr %= 2000;
+//          }
+//          errorAltitudeI = 0;
+//          isAltHoldChanged = 1;
+//        } else if (isAltHoldChanged) {
+//          AltHold = EstAlt;
+//          isAltHoldChanged = 0;
+//        }
+        
+        static int32_t takeOffCompletedTimer = 0;
+        static int32_t landingStartTimer = 0;        
+        int32_t timeMillis = millis();
+        if(EstAlt > 30) {
+          takeOffCompletedTimer = timeMillis;
         }
-        rcCommand[THROTTLE] = initialThrottleHold + BaroPID;
+        if(takeOffCompletedTimer > 0 && (timeMillis - takeOffCompletedTimer) > 5000) {
+          landingStartTimer = timeMillis;
+        }
+        int32_t throttleDecrease = 0;
+        if(landingStartTimer > 0) {
+          throttleDecrease = (timeMillis - landingStartTimer) / 6; // -500 throttle in 3 secs
+        }
+        
+        rcCommand[THROTTLE] = initialThrottleHold + BaroPID - throttleDecrease;
 //      #endif
     }
   #endif
