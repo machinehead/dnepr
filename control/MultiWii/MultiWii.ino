@@ -909,6 +909,9 @@ void loop () {
   if (currentTime > rcTime ) { // 50Hz
     rcTime = currentTime + 20000;
     computeRC();
+    rcData[YAW] = 1500;
+    rcData[ROLL] = 1500;
+    rcData[PITCH] = 1500;    
     // Failsafe routine - added by MIS
     #if defined(FAILSAFE)
       if ( failsafeCnt > (5*FAILSAFE_DELAY) && f.ARMED) {                  // Stabilize, and set Throttle to specified level
