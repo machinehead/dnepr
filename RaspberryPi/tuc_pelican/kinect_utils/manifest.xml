@@ -1,0 +1,22 @@
+<package>
+  <description brief="kinect_utils">
+
+     This packages contains a node that processes the 3D point cloud provided by the kinect sensor to identify walls, obstacles, and the position and orientation of the sensor inside a corridor. The node generates a trajectory to navigate down the corridor.
+
+
+  </description>
+  <author>Niko Suenderhauf, Peer Neubert</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/kinect_utils</url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="pcl"/>
+  <depend package="opencv2" />
+  <depend package="cv_bridge" />
+  <depend package="image_transport" />
+  <depend package="visualization_msgs"/>
+
+</package>
+
+
