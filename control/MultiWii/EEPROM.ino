@@ -17,11 +17,9 @@ void readGlobalSet() {
  
 void readEEPROM() {
   uint8_t i;
-  #ifdef MULTIPLE_CONFIGURATION_PROFILES
-    if(global_conf.currentSet>2) global_conf.currentSet=0;
-  #else
-    global_conf.currentSet=0;
-  #endif
+  
+  global_conf.currentSet=0;
+  
   eeprom_read_block((void*)&conf, (void*)(global_conf.currentSet * sizeof(conf) + sizeof(global_conf)), sizeof(conf));
   if(calculate_sum((uint8_t*)&conf, sizeof(conf)) != conf.checksum) {
     blinkLED(6,100,3);    
@@ -45,22 +43,6 @@ void readEEPROM() {
   #if defined(POWERMETER)
     pAlarm = (uint32_t) conf.powerTrigger1 * (uint32_t) PLEVELSCALE * (uint32_t) conf.pleveldiv; // need to cast before multiplying
   #endif
-  #ifdef FLYING_WING
-    #ifdef LCD_CONF
-      conf.wing_left_mid  = constrain(conf.wing_left_mid, WING_LEFT_MIN,  WING_LEFT_MAX); //LEFT
-      conf.wing_right_mid = constrain(conf.wing_right_mid, WING_RIGHT_MIN, WING_RIGHT_MAX); //RIGHT
-    #else // w.o LCD support user may not find this value stored in eeprom, so always use the define value
-      conf.wing_left_mid  = WING_LEFT_MID;
-      conf.wing_right_mid = WING_RIGHT_MID;
-    #endif
-  #endif
-  #ifdef TRI
-    #ifdef LCD_CONF
-      conf.tri_yaw_middle = constrain(conf.tri_yaw_middle, TRI_YAW_CONSTRAINT_MIN, TRI_YAW_CONSTRAINT_MAX); //REAR
-    #else // w.o LCD support user may not find this value stored in eeprom, so always use the define value
-      conf.tri_yaw_middle = TRI_YAW_MIDDLE;
-    #endif
-  #endif
   #if GPS
     if (f.I2C_INIT_DONE) GPS_set_pids();
   #endif
@@ -69,9 +51,6 @@ void readEEPROM() {
   #endif
   #ifdef POWERMETER_SOFT
      conf.pleveldivsoft = conf.pleveldiv;
-  #endif
-  #if defined(ARMEDTIMEWARNING)
-    ArmedTimeWarningMicroSeconds = (conf.armedtimewarning *1000000);
   #endif
 }
 
@@ -86,11 +65,8 @@ void writeGlobalSet(uint8_t b) {
 }
  
 void writeParams(uint8_t b) {
-  #ifdef MULTIPLE_CONFIGURATION_PROFILES
-    if(global_conf.currentSet>2) global_conf.currentSet=0;
-  #else
-    global_conf.currentSet=0;
-  #endif
+  global_conf.currentSet=0;
+  
   conf.checksum = calculate_sum((uint8_t*)&conf, sizeof(conf));
   eeprom_write_block((const void*)&conf, (void*)(global_conf.currentSet * sizeof(conf) + sizeof(global_conf)), sizeof(conf));
   readEEPROM();
@@ -123,23 +99,6 @@ void LoadDefaults() {
   for(uint8_t i=0;i<CHECKBOXITEMS;i++) {conf.activate[i] = 0;}
   conf.angleTrim[0] = 0; conf.angleTrim[1] = 0;
   conf.powerTrigger1 = 0;
-  #ifdef FLYING_WING
-    conf.wing_left_mid  = WING_LEFT_MID; 
-    conf.wing_right_mid = WING_RIGHT_MID; 
-  #endif
-  #ifdef FIXEDWING
-    conf.dynThrPID = 50;
-    conf.rcExpo8   =  0;
-  #endif
-  #ifdef TRI
-    conf.tri_yaw_middle = TRI_YAW_MIDDLE;
-  #endif
-  #if defined HELICOPTER || defined(AIRPLANE)|| defined(SINGLECOPTER)|| defined(DUALCOPTER)
-    {
-      int16_t s[8] = SERVO_OFFSET;
-      for(uint8_t i=0;i<8;i++) conf.servoTrim[i] = s[i];
-    }
-  #endif
   #if defined(GYRO_SMOOTHING)
     {
       uint8_t s[3] = GYRO_SMOOTHING;
@@ -162,9 +121,6 @@ void LoadDefaults() {
     conf.pleveldiv = PLEVELDIV;
     conf.pint2ma = PINT2mA;
   #endif
-  #ifdef CYCLETIME_FIXATED
-    conf.cycletime_fixated = CYCLETIME_FIXATED;
-  #endif
   #ifdef MMGYRO
     conf.mmgyro = MMGYRO;
   #endif
@@ -179,24 +135,3 @@ void LoadDefaults() {
   #endif
   writeParams(0); // this will also (p)reset checkNewConf with the current version number again.
 }
-
-#ifdef LOG_PERMANENT
-void readPLog() {
-  eeprom_read_block((void*)&plog, (void*)(LOG_PERMANENT - sizeof(plog)), sizeof(plog));
-  if(calculate_sum((uint8_t*)&plog, sizeof(plog)) != plog.checksum) {
-    blinkLED(9,100,3);
-    #if defined(BUZZER)
-      alarmArray[7] = 3;
-    #endif
-    // force load defaults
-    plog.arm = plog.disarm = plog.start = plog.failsafe = plog.i2c = 0;
-    plog.running = 1;
-    plog.lifetime = plog.armed_time = 0;
-    writePLog();
-  }
-}
-void writePLog() {
-  plog.checksum = calculate_sum((uint8_t*)&plog, sizeof(plog));
-  eeprom_write_block((const void*)&plog, (void*)(LOG_PERMANENT - sizeof(plog)), sizeof(plog));
-}
-#endif
