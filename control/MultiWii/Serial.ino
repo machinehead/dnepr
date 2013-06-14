@@ -118,7 +118,7 @@ void serializeNames(PGM_P s)
 }
 
 //check commands from seral port and respond
-void serialCom() {
+void SerialCom() {
   uint8_t c,n;  
   static uint8_t offset[UART_NUMBER];
   static uint8_t dataSize[UART_NUMBER];
@@ -144,7 +144,7 @@ void serialCom() {
         if (c_state[CURRENTPORT] == IDLE) {
           c_state[CURRENTPORT] = (c=='$') ? HEADER_START : IDLE;
           if (c_state[CURRENTPORT] == IDLE) {
-            evaluateOtherData(c); // evaluate all other incoming serial data
+  //          evaluateOtherData(c); // evaluate all other incoming serial data
           }
         } else if (c_state[CURRENTPORT] == HEADER_START) {
           c_state[CURRENTPORT] = (c=='M') ? HEADER_M : IDLE;
@@ -178,7 +178,8 @@ void serialCom() {
   }
 }
 
-void evaluateCommand() {
+//process command for current port
+static void inline evaluateCommand() {
   switch(cmdMSP[CURRENTPORT]) {
    case MSP_SET_RAW_RC:
      for( uint8_t i = 0; i < 8; i++ ) {
@@ -423,14 +424,6 @@ void evaluateCommand() {
   tailSerialReply();
 }
 
-// evaluate all other incoming serial data
-void evaluateOtherData(uint8_t sr) {
-    // Note: we may receive weird characters here which could trigger unwanted features during flight.
-    //       this could lead to a crash easily.
-    //       Please use if (!f.ARMED) where neccessary
-    //commented out
-}
-
 // *******************************************************
 // Interrupt driven UART transmitter - using a ring buffer
 // *******************************************************
@@ -462,7 +455,7 @@ void UartSendData() {
 }
 
 
-static void inline SerialOpen(uint8_t port, uint32_t baud) {
+void SerialOpen(uint8_t port, uint32_t baud) {
   uint8_t h = ((F_CPU  / 4 / baud -1) / 2) >> 8;
   uint8_t l = ((F_CPU  / 4 / baud -1) / 2);
   switch (port) {

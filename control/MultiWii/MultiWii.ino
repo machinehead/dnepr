@@ -503,12 +503,10 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
       f.ACC_CALIBRATED = 1;
     }
   }
-
- 
+  
+  //Processing commands from serial port  
+  SerialCom();
     
-      serialCom();
-    
-
   #if defined(POWERMETER)
     intPowerMeterSum = (pMeter[PMOTOR_SUM]/conf.pleveldiv);
     intPowerTrigger1 = conf.powerTrigger1 * PLEVELSCALE; 
@@ -542,7 +540,7 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
 
 void setup() {
   
-    SerialOpen(0,SERIAL0_COM_SPEED);
+  SerialOpen(0,SERIAL0_COM_SPEED);
   
   LEDPIN_PINMODE;
   POWERPIN_PINMODE;
