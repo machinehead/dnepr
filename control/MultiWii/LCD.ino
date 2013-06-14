@@ -7,7 +7,7 @@
 
 /* ------------------------------------------------------------------ */
 void LCDprint(uint8_t i) {
-    SerialWrite(LCD_SERIAL_PORT, i );
+    SerialWrite( i );
 }
 
 void LCDprintChar(const char *s) {

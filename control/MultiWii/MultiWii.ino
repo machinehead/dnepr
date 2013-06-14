@@ -540,7 +540,7 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
 
 void setup() {
   
-  SerialOpen(0,SERIAL0_COM_SPEED);
+  SerialOpen( SERIAL0_COM_SPEED );
   
   LEDPIN_PINMODE;
   POWERPIN_PINMODE;

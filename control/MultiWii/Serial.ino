@@ -1,13 +1,12 @@
-#define UART_NUMBER 1
 #define RX_BUFFER_SIZE 64
 #define TX_BUFFER_SIZE 128
 #define INBUF_SIZE 64
 
-static volatile uint8_t serialHeadRX[UART_NUMBER],serialTailRX[UART_NUMBER];
-static uint8_t serialBufferRX[RX_BUFFER_SIZE][UART_NUMBER];
-static volatile uint8_t serialHeadTX[UART_NUMBER],serialTailTX[UART_NUMBER];
-static uint8_t serialBufferTX[TX_BUFFER_SIZE][UART_NUMBER];
-static uint8_t inBuf[INBUF_SIZE][UART_NUMBER];
+static volatile uint8_t serialHeadRX, serialTailRX;
+static uint8_t serialBufferRX[RX_BUFFER_SIZE];
+static volatile uint8_t serialHeadTX, serialTailTX;
+static uint8_t serialBufferTX[TX_BUFFER_SIZE];
+static uint8_t inBuf[INBUF_SIZE];
 
 #define BIND_CAPABLE 0;  //Used for Spektrum today; can be used in the future for any RX type that needs a bind and has a MultiWii module. 
 // Capability is bit flags; next defines should be 2, 4, 8...
@@ -59,29 +58,27 @@ const uint32_t PROGMEM capability = 0+BIND_CAPABLE;
 #define MSP_DEBUGMSG             253   //out message         debug string buffer
 #define MSP_DEBUG                254   //out message         debug1,debug2,debug3,debug4
 
-static uint8_t checksum[UART_NUMBER];
-static uint8_t indRX[UART_NUMBER];
-static uint8_t cmdMSP[UART_NUMBER];
-
-#define CURRENTPORT 0
+static uint8_t checksum;
+static uint8_t indRX;
+static uint8_t cmdMSP;
 
 uint32_t read32() 
 {
   uint32_t t = read16();
-  t += (uint32_t)read16()<<16;
+  t += (uint32_t)read16() << 16;
   return t;
 }
 
 uint16_t read16() 
 {
   uint16_t t = read8();
-  t += (uint16_t)read8()<<8;
+  t += (uint16_t)read8() << 8;
   return t;
 }
 
 uint8_t read8() 
 {
-  return inBuf[indRX[CURRENTPORT]++][CURRENTPORT]&0xff;
+  return inBuf[indRX++] & 0xff;
 }
 
 void headSerialResponse(uint8_t err, uint8_t s) 
@@ -89,9 +86,9 @@ void headSerialResponse(uint8_t err, uint8_t s)
   serialize8('$');
   serialize8('M');
   serialize8(err ? '!' : '>');
-  checksum[CURRENTPORT] = 0; // start calculating a new checksum
+  checksum = 0; // start calculating a new checksum
   serialize8(s);
-  serialize8(cmdMSP[CURRENTPORT]);
+  serialize8( cmdMSP );
 }
 
 void headSerialReply(uint8_t s) 
@@ -106,13 +103,13 @@ void inline headSerialError(uint8_t s)
 
 void tailSerialReply() 
 {
-  serialize8(checksum[CURRENTPORT]);
+  serialize8( checksum );
   UartSendData();
 }
 
 void serializeNames(PGM_P s) 
 {
-  for (PGM_P c = s; pgm_read_byte(c); c++) {
+  for( PGM_P c = s; pgm_read_byte(c); c++ ) {
     serialize8(pgm_read_byte(c));
   }
 }
@@ -120,8 +117,8 @@ void serializeNames(PGM_P s)
 //check commands from seral port and respond
 void SerialCom() {
   uint8_t c,n;  
-  static uint8_t offset[UART_NUMBER];
-  static uint8_t dataSize[UART_NUMBER];
+  static uint8_t offset;
+  static uint8_t dataSize;
   static enum _serial_state {
     IDLE,
     HEADER_START,
@@ -129,50 +126,50 @@ void SerialCom() {
     HEADER_ARROW,
     HEADER_SIZE,
     HEADER_CMD,
-  } c_state[UART_NUMBER];// = IDLE;
+  } c_state;// = IDLE;
 
-  for( n=0; n < UART_NUMBER; n++) {
+  {
     #define GPS_COND
     #define SPEK_COND
-    while( SerialAvailable(CURRENTPORT) GPS_COND SPEK_COND ) {
-      uint8_t bytesTXBuff = ((uint8_t)(serialHeadTX[CURRENTPORT]-serialTailTX[CURRENTPORT]))%TX_BUFFER_SIZE; // indicates the number of occupied bytes in TX buffer
+    while( SerialAvailable() GPS_COND SPEK_COND ) {
+      uint8_t bytesTXBuff = ( (uint8_t)(serialHeadTX - serialTailTX) ) % TX_BUFFER_SIZE; // indicates the number of occupied bytes in TX buffer
       if (bytesTXBuff > TX_BUFFER_SIZE - 50 ) {
         return; // ensure there is enough free TX buffer to go further (50 bytes margin)
       }
-      c = SerialRead(CURRENTPORT);
+      c = SerialRead();
         // regular data handling to detect and handle MSP and other data
-        if (c_state[CURRENTPORT] == IDLE) {
-          c_state[CURRENTPORT] = (c=='$') ? HEADER_START : IDLE;
-          if (c_state[CURRENTPORT] == IDLE) {
+        if (c_state == IDLE) {
+          c_state = (c=='$') ? HEADER_START : IDLE;
+          if (c_state == IDLE) {
   //          evaluateOtherData(c); // evaluate all other incoming serial data
           }
-        } else if (c_state[CURRENTPORT] == HEADER_START) {
-          c_state[CURRENTPORT] = (c=='M') ? HEADER_M : IDLE;
-        } else if (c_state[CURRENTPORT] == HEADER_M) {
-          c_state[CURRENTPORT] = (c=='<') ? HEADER_ARROW : IDLE;
-        } else if (c_state[CURRENTPORT] == HEADER_ARROW) {
+        } else if( c_state == HEADER_START ) {
+          c_state = (c=='M') ? HEADER_M : IDLE;
+        } else if( c_state == HEADER_M ) {
+          c_state = (c=='<') ? HEADER_ARROW : IDLE;
+        } else if( c_state == HEADER_ARROW ) {
           if (c > INBUF_SIZE) {  // now we are expecting the payload size
-            c_state[CURRENTPORT] = IDLE;
+            c_state = IDLE;
             continue;
           }
-          dataSize[CURRENTPORT] = c;
-          offset[CURRENTPORT] = 0;
-          checksum[CURRENTPORT] = 0;
-          indRX[CURRENTPORT] = 0;
-          checksum[CURRENTPORT] ^= c;
-          c_state[CURRENTPORT] = HEADER_SIZE;  // the command is to follow
-        } else if (c_state[CURRENTPORT] == HEADER_SIZE) {
-          cmdMSP[CURRENTPORT] = c;
-          checksum[CURRENTPORT] ^= c;
-          c_state[CURRENTPORT] = HEADER_CMD;
-        } else if (c_state[CURRENTPORT] == HEADER_CMD && offset[CURRENTPORT] < dataSize[CURRENTPORT]) {
-          checksum[CURRENTPORT] ^= c;
-          inBuf[offset[CURRENTPORT]++][CURRENTPORT] = c;
-        } else if (c_state[CURRENTPORT] == HEADER_CMD && offset[CURRENTPORT] >= dataSize[CURRENTPORT]) {
-          if (checksum[CURRENTPORT] == c) {  // compare calculated and transferred checksum
+          dataSize = c;
+          offset = 0;
+          checksum = 0;
+          indRX = 0;
+          checksum ^= c;
+          c_state = HEADER_SIZE;  // the command is to follow
+        } else if( c_state == HEADER_SIZE ) {
+          cmdMSP = c;
+          checksum ^= c;
+          c_state = HEADER_CMD;
+        } else if( c_state == HEADER_CMD && offset < dataSize ) {
+          checksum ^= c;
+          inBuf[offset++] = c;
+        } else if( c_state == HEADER_CMD && offset >= dataSize ) {
+          if( checksum == c ) {  // compare calculated and transferred checksum
             evaluateCommand();  // we got a valid packet, evaluate it
           }
-          c_state[CURRENTPORT] = IDLE;
+          c_state = IDLE;
         }
     }
   }
@@ -180,7 +177,7 @@ void SerialCom() {
 
 //process command for current port
 static void inline evaluateCommand() {
-  switch(cmdMSP[CURRENTPORT]) {
+  switch( cmdMSP ) {
    case MSP_SET_RAW_RC:
      for( uint8_t i = 0; i < 8; i++ ) {
        rcData[i] = read16();
@@ -238,41 +235,41 @@ static void inline evaluateCommand() {
      serialize8(VERSION);   // multiwii version
      serialize8(MULTITYPE); // type of multicopter
      serialize8(MSP_VERSION);         // MultiWii Serial Protocol Version
-     serialize32(pgm_read_dword(&(capability)));        // "capability"
+     serialize32( pgm_read_dword( &(capability) ) );        // "capability"
      break;
    case MSP_STATUS:
      headSerialReply(11);
      serialize16(cycleTime);
      serialize16(i2c_errors_count);
-     serialize16(ACC|BARO<<1|MAG<<2|GPS<<3|SONAR<<4);
+     serialize16( ACC | BARO << 1 | MAG << 2 | GPS << 3 | SONAR << 4 );
      serialize32(
                  #if ACC
-                   f.ANGLE_MODE<<BOXANGLE|
-                   f.HORIZON_MODE<<BOXHORIZON|
+                   f.ANGLE_MODE << BOXANGLE |
+                   f.HORIZON_MODE << BOXHORIZON |
                  #endif
                  #if BARO && (!defined(SUPPRESS_BARO_ALTHOLD))
-                   f.BARO_MODE<<BOXBARO|
+                   f.BARO_MODE << BOXBARO |
                  #endif
                  #if MAG
-                   f.MAG_MODE<<BOXMAG|f.HEADFREE_MODE<<BOXHEADFREE|rcOptions[BOXHEADADJ]<<BOXHEADADJ|
+                   f.MAG_MODE << BOXMAG | f.HEADFREE_MODE << BOXHEADFREE | rcOptions[BOXHEADADJ] << BOXHEADADJ |
                  #endif
                  #if GPS
-                   f.GPS_HOME_MODE<<BOXGPSHOME|f.GPS_HOLD_MODE<<BOXGPSHOLD|
+                   f.GPS_HOME_MODE << BOXGPSHOME | f.GPS_HOLD_MODE << BOXGPSHOLD |
                  #endif
                  #if defined(BUZZER)
-                   rcOptions[BOXBEEPERON]<<BOXBEEPERON|
+                   rcOptions[BOXBEEPERON] << BOXBEEPERON |
                  #endif
                  #if defined(VARIOMETER)
-                   rcOptions[BOXVARIO]<<BOXVARIO |
+                   rcOptions[BOXVARIO] << BOXVARIO |
                  #endif
                  #if defined(INFLIGHT_ACC_CALIBRATION)
-                   rcOptions[BOXCALIB]<<BOXCALIB |
+                   rcOptions[BOXCALIB] << BOXCALIB |
                  #endif
                  #if defined(GOVERNOR_P)
-                   rcOptions[BOXGOV]<<BOXGOV |
+                   rcOptions[BOXGOV] << BOXGOV |
                  #endif
-                 f.ARMED<<BOXARM);
-       serialize8(global_conf.currentSet);   // current setting
+                 f.ARMED << BOXARM );
+       serialize8( global_conf.currentSet );   // current setting
      break;
    case MSP_RAW_IMU:
      headSerialReply(18);
@@ -441,47 +438,48 @@ void serialize16(int16_t a) {
 }
 
 void serialize8(uint8_t a) {
-  uint8_t t = serialHeadTX[CURRENTPORT];
+  uint8_t t = serialHeadTX;
   if( ++t >= TX_BUFFER_SIZE ) {
     t = 0;
   }
-  serialBufferTX[t][CURRENTPORT] = a;
-  checksum[CURRENTPORT] ^= a;
-  serialHeadTX[CURRENTPORT] = t;
+  serialBufferTX[t] = a;
+  checksum ^= a;
+  serialHeadTX = t;
 }
 
 void UartSendData() {
-    UCSR0B |= (1<<UDRIE0);
+    UCSR0B |= (1 << UDRIE0);
 }
 
 
-void SerialOpen(uint8_t port, uint32_t baud) {
+void SerialOpen( uint32_t baud ) {
   uint8_t h = ((F_CPU  / 4 / baud -1) / 2) >> 8;
   uint8_t l = ((F_CPU  / 4 / baud -1) / 2);
-  switch (port) {
     
-      case 0: UCSR0A  = (1<<U2X0); UBRR0H = h; UBRR0L = l; UCSR0B |= (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0); break;
-    
-  }
+  UCSR0A  = (1<<U2X0); 
+  UBRR0H = h; 
+  UBRR0L = l; 
+  UCSR0B |= (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
 }
 
-uint8_t SerialRead(uint8_t port) {
-  uint8_t t = serialTailRX[port];
-  uint8_t c = serialBufferRX[t][port];
-  if (serialHeadRX[port] != t) {
+uint8_t SerialRead() {
+  uint8_t t = serialTailRX;
+  uint8_t c = serialBufferRX[t];
+  if( serialHeadRX != t ) {
     if( ++t >= RX_BUFFER_SIZE ) {
       t = 0;
     }
-    serialTailRX[port] = t;
+    serialTailRX = t;
   }
   return c;
 }
 
-uint8_t SerialAvailable(uint8_t port) {
-  return ( serialHeadRX[port] - serialTailRX[port] ) % RX_BUFFER_SIZE;
+uint8_t SerialAvailable() {
+  return ( serialHeadRX - serialTailRX ) % RX_BUFFER_SIZE;
 }
 
-void SerialWrite(uint8_t port,uint8_t c){
+void SerialWrite( uint8_t c )
+{
   serialize8(c);
   UartSendData();
 }
