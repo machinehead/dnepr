@@ -472,14 +472,6 @@ static void inline SerialOpen(uint8_t port, uint32_t baud) {
   }
 }
 
-static void inline SerialEnd(uint8_t port) {
-  switch (port) {
-    
-      case 0: UCSR0B &= ~((1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0)|(1<<UDRIE0)); break;
-    
-  }
-}
-
 uint8_t SerialRead(uint8_t port) {
   uint8_t t = serialTailRX[port];
   uint8_t c = serialBufferRX[t][port];
