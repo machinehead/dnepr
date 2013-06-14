@@ -457,20 +457,6 @@ void serialize8(uint8_t a) {
   serialHeadTX[CURRENTPORT] = t;
 }
 
-ISR(USART_UDRE_vect) {  // Serial 0 on a PROMINI
-    uint8_t t = serialTailTX[0];
-    if (serialHeadTX[0] != t) {
-      if( ++t >= TX_BUFFER_SIZE ) {
-        t = 0;
-      }
-      UDR0 = serialBufferTX[t][0];  // Transmit next byte in the ring
-      serialTailTX[0] = t;
-    }
-    if( t == serialHeadTX[0] ) {
-      UCSR0B &= ~(1<<UDRIE0); // Check if all data is transmitted . if yes disable transmitter UDRE interrupt
-    }
-}
-
 void UartSendData() {
     UCSR0B |= (1<<UDRIE0);
 }
@@ -493,21 +479,6 @@ static void inline SerialEnd(uint8_t port) {
     
   }
 }
-
-static void inline store_uart_in_buf(uint8_t data, uint8_t portnum) {
-  
-  uint8_t h = serialHeadRX[portnum];
-  if( ++h >= RX_BUFFER_SIZE ) {
-    h = 0;
-  }
-  if( h == serialTailRX[portnum] ) {
-    return; // we did not bite our own tail?
-  }
-  serialBufferRX[serialHeadRX[portnum]][portnum] = data;  
-  serialHeadRX[portnum] = h;
-}
-
-ISR(USART_RX_vect)  { store_uart_in_buf(UDR0, 0); }
 
 uint8_t SerialRead(uint8_t port) {
   uint8_t t = serialTailRX[port];
