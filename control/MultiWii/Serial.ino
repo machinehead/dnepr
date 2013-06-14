@@ -129,9 +129,7 @@ void SerialCom() {
   } c_state;// = IDLE;
 
   {
-    #define GPS_COND
-    #define SPEK_COND
-    while( SerialAvailable() GPS_COND SPEK_COND ) {
+    while( SerialAvailable() ) {
       uint8_t bytesTXBuff = ( (uint8_t)(serialHeadTX - serialTailTX) ) % TX_BUFFER_SIZE; // indicates the number of occupied bytes in TX buffer
       if (bytesTXBuff > TX_BUFFER_SIZE - 50 ) {
         return; // ensure there is enough free TX buffer to go further (50 bytes margin)
