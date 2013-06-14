@@ -113,18 +113,35 @@
 /***************              Sensor Type definitions              ********************/
 /**************************************************************************************/
 
+#if defined(LSM303DLHC_ACC)
+  #define ACC 1
+#else
+  #define ACC 0
+#endif
 
-#define ACC 1 //LSM303DLHC_ACC
+#if defined(LSM303DLHC_MAG)
+  #define MAG 1
+#else
+  #define MAG 0
+#endif
 
-#define MAG 1 //LSM303DLHC_MAG
+#if defined(L3GD20)
+  #define GYRO 1
+#else
+  #define GYRO 0
+#endif
 
-#define GYRO 1 //L3GD20
+
 
 //  #define BARO 1 //defined in config.h
 
 //    #define GPS 1 //defined in config.h
 
-#define SONAR 1 //SRF08
+#if defined(SRF08)
+  #define SONAR 1
+#else
+  #define SONAR 0
+#endif
 
 
 /**************************************************************************************/

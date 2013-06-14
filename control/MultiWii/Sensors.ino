@@ -316,32 +316,34 @@ void ACC_Common() {
 
 // ************************************************************************************************************
 // ************************************************************************************************************
-// I2C Accelerometer LSM303DLx
+// I2C Accelerometer LSM303DLHC
 // ************************************************************************************************************
-
-#define LSM303DLx_ACC_ADDRESS 0x18
+#if defined(LSM303DLHC_ACC)
+#define LSM303DLHC_ACC_ADDRESS 0x19
 void ACC_init () {
   delay(10);
-  i2c_writeReg(LSM303DLx_ACC_ADDRESS,0x20,0x27); // REG1_A, normal power mode, 50 Hz, all axis enable
-  i2c_writeReg(LSM303DLx_ACC_ADDRESS,0x23,0x30); // REG4_A, scale +/- 8G
-  i2c_writeReg(LSM303DLx_ACC_ADDRESS,0x21,0x00); // REG2_A, filter off
+  i2c_writeReg(LSM303DLHC_ACC_ADDRESS,0x20,0x77); // REG1_A, normal power mode, 50 Hz, all axis enable
+  i2c_writeReg(LSM303DLHC_ACC_ADDRESS,0x23,0x20); // REG4_A, scale +/- 8G
+  i2c_writeReg(LSM303DLHC_ACC_ADDRESS,0x21,0x00); // REG2_A, filter off
 
   acc_1G = 256;
 }
 
   void ACC_getADC () {
   TWBR = ((F_CPU / 400000L) - 16) / 2;
-  i2c_getSixRawADC(LSM303DLx_ACC_ADDRESS,0xA8);
+  i2c_getSixRawADC(LSM303DLHC_ACC_ADDRESS,0xA8);
 
   ACC_ORIENTATION( ((rawADC[1]<<8) | rawADC[0])>>4 ,
                    ((rawADC[3]<<8) | rawADC[2])>>4 ,
                    ((rawADC[5]<<8) | rawADC[4])>>4 );
   ACC_Common();
 }
+#endif
 
 // ************************************************************************************************************
 // I2C Gyroscope L3GD20 
 // ************************************************************************************************************
+#if defined(L3GD20)
 #define L3GD20_ADDRESS (0xD6 >> 1)
 void Gyro_init() {
   delay(100);
@@ -360,6 +362,7 @@ void Gyro_getADC () {
                     ((rawADC[5]<<8) | rawADC[4])/20  );
   GYRO_Common();
 }
+#endif
 
 // ************************************************************************************************************
 // I2C Compass common function
@@ -429,7 +432,7 @@ uint8_t Mag_getADC() { // return 1 when news values are available, 0 otherwise
 // ************************************************************************************************************
 // I2C adress: 0x1E (7bit)
 // ************************************************************************************************************
-
+#if defined(LSM303DLHC_MAG)
   #define MAG_ADDRESS 0x1E
   #define MAG_DATA_REGISTER 0x03
   #define MAG_CTRL_REG1 0x2
@@ -446,6 +449,7 @@ uint8_t Mag_getADC() { // return 1 when news values are available, 0 otherwise
                      ((rawADC[2]<<8) | rawADC[3]) ,     
                      ((rawADC[4]<<8) | rawADC[5]) );
   }
+#endif
 
 // ************************************************************************************************************
 // I2C Sonar SRF08
@@ -454,6 +458,7 @@ uint8_t Mag_getADC() { // return 1 when news values are available, 0 otherwise
 //
 // specs are here: http://www.meas-spec.com/downloads/MS5611-01BA03.pdf
 // useful info on pages 7 -> 12
+#if defined(SRF08)
 
 // the default address for any new sensor found on the bus
 // the code will move new sonars to the next available sonar address in range of F0-FE so that another
@@ -640,6 +645,10 @@ void Sonar_update() {
   // debug[1] = srf08_ctx.range[1];
   // debug[2] = srf08_ctx.range[2];  
 }
+#else
+inline void Sonar_init() {}
+inline void Sonar_update() {}
+#endif
 
 
 #if defined(BARO)
