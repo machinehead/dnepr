@@ -63,23 +63,29 @@ static uint8_t checksum[UART_NUMBER];
 static uint8_t indRX[UART_NUMBER];
 static uint8_t cmdMSP[UART_NUMBER];
 
-  #define CURRENTPORT 0
+#define CURRENTPORT 0
 
-uint32_t read32() {
+uint32_t read32() 
+{
   uint32_t t = read16();
-  t+= (uint32_t)read16()<<16;
+  t += (uint32_t)read16()<<16;
   return t;
 }
-uint16_t read16() {
+
+uint16_t read16() 
+{
   uint16_t t = read8();
-  t+= (uint16_t)read8()<<8;
+  t += (uint16_t)read8()<<8;
   return t;
 }
-uint8_t read8()  {
+
+uint8_t read8() 
+{
   return inBuf[indRX[CURRENTPORT]++][CURRENTPORT]&0xff;
 }
 
-void headSerialResponse(uint8_t err, uint8_t s) {
+void headSerialResponse(uint8_t err, uint8_t s) 
+{
   serialize8('$');
   serialize8('M');
   serialize8(err ? '!' : '>');
@@ -88,24 +94,30 @@ void headSerialResponse(uint8_t err, uint8_t s) {
   serialize8(cmdMSP[CURRENTPORT]);
 }
 
-void headSerialReply(uint8_t s) {
+void headSerialReply(uint8_t s) 
+{
   headSerialResponse(0, s);
 }
 
-void inline headSerialError(uint8_t s) {
+void inline headSerialError(uint8_t s) 
+{
   headSerialResponse(1, s);
 }
 
-void tailSerialReply() {
-  serialize8(checksum[CURRENTPORT]);UartSendData();
+void tailSerialReply() 
+{
+  serialize8(checksum[CURRENTPORT]);
+  UartSendData();
 }
 
-void serializeNames(PGM_P s) {
+void serializeNames(PGM_P s) 
+{
   for (PGM_P c = s; pgm_read_byte(c); c++) {
     serialize8(pgm_read_byte(c));
   }
 }
 
+//check commands from seral port and respond
 void serialCom() {
   uint8_t c,n;  
   static uint8_t offset[UART_NUMBER];
@@ -119,17 +131,21 @@ void serialCom() {
     HEADER_CMD,
   } c_state[UART_NUMBER];// = IDLE;
 
-  for(n=0;n<UART_NUMBER;n++) {
+  for( n=0; n < UART_NUMBER; n++) {
     #define GPS_COND
     #define SPEK_COND
-    while (SerialAvailable(CURRENTPORT) GPS_COND SPEK_COND) {
+    while( SerialAvailable(CURRENTPORT) GPS_COND SPEK_COND ) {
       uint8_t bytesTXBuff = ((uint8_t)(serialHeadTX[CURRENTPORT]-serialTailTX[CURRENTPORT]))%TX_BUFFER_SIZE; // indicates the number of occupied bytes in TX buffer
-      if (bytesTXBuff > TX_BUFFER_SIZE - 50 ) return; // ensure there is enough free TX buffer to go further (50 bytes margin)
+      if (bytesTXBuff > TX_BUFFER_SIZE - 50 ) {
+        return; // ensure there is enough free TX buffer to go further (50 bytes margin)
+      }
       c = SerialRead(CURRENTPORT);
         // regular data handling to detect and handle MSP and other data
         if (c_state[CURRENTPORT] == IDLE) {
           c_state[CURRENTPORT] = (c=='$') ? HEADER_START : IDLE;
-          if (c_state[CURRENTPORT] == IDLE) evaluateOtherData(c); // evaluate all other incoming serial data
+          if (c_state[CURRENTPORT] == IDLE) {
+            evaluateOtherData(c); // evaluate all other incoming serial data
+          }
         } else if (c_state[CURRENTPORT] == HEADER_START) {
           c_state[CURRENTPORT] = (c=='M') ? HEADER_M : IDLE;
         } else if (c_state[CURRENTPORT] == HEADER_M) {
@@ -165,7 +181,7 @@ void serialCom() {
 void evaluateCommand() {
   switch(cmdMSP[CURRENTPORT]) {
    case MSP_SET_RAW_RC:
-     for(uint8_t i=0;i<8;i++) {
+     for( uint8_t i = 0; i < 8; i++ ) {
        rcData[i] = read16();
      }
      headSerialReply(0);
@@ -183,7 +199,7 @@ void evaluateCommand() {
      break;
    #endif
    case MSP_SET_PID:
-     for(uint8_t i=0;i<PIDITEMS;i++) {
+     for( uint8_t i = 0; i < PIDITEMS; i++ ) {
        conf.P8[i]=read8();
        conf.I8[i]=read8();
        conf.D8[i]=read8();
@@ -191,7 +207,7 @@ void evaluateCommand() {
      headSerialReply(0);
      break;
    case MSP_SET_BOX:
-     for(uint8_t i=0;i<CHECKBOXITEMS;i++) {
+     for( uint8_t i = 0; i < CHECKBOXITEMS; i++ ) {
        conf.activate[i]=read16();
      }
      headSerialReply(0);
@@ -212,7 +228,6 @@ void evaluateCommand() {
      #endif
      headSerialReply(0);
      break;
-   
    case MSP_SET_HEAD:
      magHold = read16();
      headSerialReply(0);
@@ -260,24 +275,33 @@ void evaluateCommand() {
      break;
    case MSP_RAW_IMU:
      headSerialReply(18);
-     for(uint8_t i=0;i<3;i++) serialize16(accSmooth[i]);
-     for(uint8_t i=0;i<3;i++) serialize16(gyroData[i]);
-     for(uint8_t i=0;i<3;i++) serialize16(magADC[i]);
+     for( uint8_t i = 0; i < 3; i++ ) {
+       serialize16(accSmooth[i]);
+     }
+     for( uint8_t i = 0; i < 3; i++ ) {
+       serialize16(gyroData[i]);
+     }
+     for( uint8_t i = 0; i < 3; i++ ) {
+       serialize16(magADC[i]);
+     }
      break;
    case MSP_SERVO:
      headSerialReply(16);
-     for(uint8_t i=0;i<8;i++)
+     for( uint8_t i = 0; i < 8; i++ ) {
        serialize16(0);
+     }
      break;
    case MSP_MOTOR:
      headSerialReply(16);
-     for(uint8_t i=0;i<8;i++) {
+     for( uint8_t i = 0; i < 8; i++ ) {
        serialize16( (i < NUMBER_MOTOR) ? motor[i] : 0 );
      }
      break;
    case MSP_RC:
      headSerialReply(RC_CHANS * 2);
-     for(uint8_t i=0;i<RC_CHANS;i++) serialize16(rcData[i]);
+     for( uint8_t i = 0; i < RC_CHANS; i++ ) {
+       serialize16(rcData[i]);
+     }
      break;
    #if GPS
    case MSP_RAW_GPS:
@@ -299,7 +323,9 @@ void evaluateCommand() {
    #endif
    case MSP_ATTITUDE:
      headSerialReply(8);
-     for(uint8_t i=0;i<2;i++) serialize16(angle[i]);
+     for( uint8_t i = 0; i < 2; i++ ) {
+       serialize16(angle[i]);
+     }
      serialize16(heading);
      serialize16(headFreeModeHold);
      break;
@@ -326,7 +352,7 @@ void evaluateCommand() {
      break;
    case MSP_PID:
      headSerialReply(3*PIDITEMS);
-     for(uint8_t i=0;i<PIDITEMS;i++) {
+     for( uint8_t i = 0; i < PIDITEMS; i++ ) {
        serialize8(conf.P8[i]);
        serialize8(conf.I8[i]);
        serialize8(conf.D8[i]);
@@ -338,7 +364,7 @@ void evaluateCommand() {
      break;
    case MSP_BOX:
      headSerialReply(2*CHECKBOXITEMS);
-     for(uint8_t i=0;i<CHECKBOXITEMS;i++) {
+     for( uint8_t i = 0; i < CHECKBOXITEMS; i++ ) {
        serialize16(conf.activate[i]);
      }
      break;
@@ -348,7 +374,7 @@ void evaluateCommand() {
      break;
    case MSP_BOXIDS:
      headSerialReply(CHECKBOXITEMS);
-     for(uint8_t i=0;i<CHECKBOXITEMS;i++) {
+     for( uint8_t i = 0; i < CHECKBOXITEMS; i++ ) {
        serialize8(pgm_read_byte(&(boxids[i])));
      }
      break;
@@ -358,20 +384,26 @@ void evaluateCommand() {
      break;
    case MSP_MOTOR_PINS:
      headSerialReply(8);
-     for(uint8_t i=0;i<8;i++) {
+     for( uint8_t i = 0; i < 8; i++ ) {
        serialize8(PWM_PIN[i]);
      }
      break;
    case MSP_RESET_CONF:
-     if(!f.ARMED) LoadDefaults();
+     if( !f.ARMED ) {
+       LoadDefaults();
+     }
      headSerialReply(0);
      break;
    case MSP_ACC_CALIBRATION:
-     if(!f.ARMED) calibratingA=512;
+     if( !f.ARMED ) {
+       calibratingA = 512;
+     }
      headSerialReply(0);
      break;
    case MSP_MAG_CALIBRATION:
-     if(!f.ARMED) f.CALIBRATE_MAG = 1;
+     if( !f.ARMED ) {
+       f.CALIBRATE_MAG = 1;
+     }
      headSerialReply(0);
      break;
    case MSP_EEPROM_WRITE:
@@ -380,7 +412,7 @@ void evaluateCommand() {
      break;
    case MSP_DEBUG:
      headSerialReply(8);
-     for(uint8_t i=0;i<4;i++) {
+     for( uint8_t i = 0; i < 4; i++ ) {
        serialize16(debug[i]); // 4 variables are here for general monitoring purpose
      }
      break;
@@ -417,7 +449,9 @@ void serialize16(int16_t a) {
 
 void serialize8(uint8_t a) {
   uint8_t t = serialHeadTX[CURRENTPORT];
-  if (++t >= TX_BUFFER_SIZE) t = 0;
+  if( ++t >= TX_BUFFER_SIZE ) {
+    t = 0;
+  }
   serialBufferTX[t][CURRENTPORT] = a;
   checksum[CURRENTPORT] ^= a;
   serialHeadTX[CURRENTPORT] = t;
@@ -426,11 +460,15 @@ void serialize8(uint8_t a) {
 ISR(USART_UDRE_vect) {  // Serial 0 on a PROMINI
     uint8_t t = serialTailTX[0];
     if (serialHeadTX[0] != t) {
-      if (++t >= TX_BUFFER_SIZE) t = 0;
+      if( ++t >= TX_BUFFER_SIZE ) {
+        t = 0;
+      }
       UDR0 = serialBufferTX[t][0];  // Transmit next byte in the ring
       serialTailTX[0] = t;
     }
-    if (t == serialHeadTX[0]) UCSR0B &= ~(1<<UDRIE0); // Check if all data is transmitted . if yes disable transmitter UDRE interrupt
+    if( t == serialHeadTX[0] ) {
+      UCSR0B &= ~(1<<UDRIE0); // Check if all data is transmitted . if yes disable transmitter UDRE interrupt
+    }
 }
 
 void UartSendData() {
@@ -459,27 +497,32 @@ static void inline SerialEnd(uint8_t port) {
 static void inline store_uart_in_buf(uint8_t data, uint8_t portnum) {
   
   uint8_t h = serialHeadRX[portnum];
-  if (++h >= RX_BUFFER_SIZE) h = 0;
-  if (h == serialTailRX[portnum]) return; // we did not bite our own tail?
+  if( ++h >= RX_BUFFER_SIZE ) {
+    h = 0;
+  }
+  if( h == serialTailRX[portnum] ) {
+    return; // we did not bite our own tail?
+  }
   serialBufferRX[serialHeadRX[portnum]][portnum] = data;  
   serialHeadRX[portnum] = h;
 }
 
-
-  ISR(USART_RX_vect)  { store_uart_in_buf(UDR0, 0); }
+ISR(USART_RX_vect)  { store_uart_in_buf(UDR0, 0); }
 
 uint8_t SerialRead(uint8_t port) {
   uint8_t t = serialTailRX[port];
   uint8_t c = serialBufferRX[t][port];
   if (serialHeadRX[port] != t) {
-    if (++t >= RX_BUFFER_SIZE) t = 0;
+    if( ++t >= RX_BUFFER_SIZE ) {
+      t = 0;
+    }
     serialTailRX[port] = t;
   }
   return c;
 }
 
 uint8_t SerialAvailable(uint8_t port) {
-  return (serialHeadRX[port] - serialTailRX[port])%RX_BUFFER_SIZE;
+  return ( serialHeadRX[port] - serialTailRX[port] ) % RX_BUFFER_SIZE;
 }
 
 void SerialWrite(uint8_t port,uint8_t c){
