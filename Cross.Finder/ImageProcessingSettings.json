@@ -30,11 +30,11 @@
     "Video":
     {
         "Mode": "0",
-        "Input": "1",
+        "Input": "0",
         "Width": "320"
     },
     "Speed":
     {
-        "WindowPercent": "20"
+        "WindowPercent": "40"
     }
 }
