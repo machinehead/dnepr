@@ -9,22 +9,24 @@
 #define VIDEOGRABBER_H_
 
 #include <iostream>
-#include "CrossFinder.h"
+#include "opencv2/core/core.hpp"
+#include "ImageProcessingSettings.h"
 
 using namespace std;
+using namespace cv;
 
 class CVideoGrabber {
 public:
-	CVideoGrabber( int  imageMode, const string& filename );
+	CVideoGrabber( const string& filename );
 	virtual ~CVideoGrabber();
 
 	void Process();
 
 private:
-    int imageMode;
     string filename;
+    CImageProcessingSettings settings;
 
-    CCrossFinder finder;
+	Mat resizeImage( const Mat& image ) const;
 };
 
 #endif /* VIDEOGRABBER_H_ */

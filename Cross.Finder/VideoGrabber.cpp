@@ -6,19 +6,22 @@
  */
 
 #include "VideoGrabber.h"
+#include "CrossFinder.h"
+#include "SpeedFinder.h"
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
 using namespace cv;
 
-CVideoGrabber::CVideoGrabber(
-	int  _imageMode, const string& _filename ) :
-	imageMode( _imageMode ),
+CVideoGrabber::CVideoGrabber( const string& _filename ) :
 	filename( _filename )
 {
+	settings.Load( "ImageProcessingSettings.json" );
 }
 
 CVideoGrabber::~CVideoGrabber()
 {
+	settings.Save( "ImageProcessingSettings.json" );
 }
 
 void CVideoGrabber::Process()
@@ -28,7 +31,7 @@ void CVideoGrabber::Process()
     if( !filename.empty() )
         capture.open( filename );
     else
-        capture.open(1);
+        capture.open( settings.VideoInput() );
 
     cout << "done." << endl;
 
@@ -39,7 +42,7 @@ void CVideoGrabber::Process()
 
     if( filename.empty()) {
         bool modeRes=false;
-        switch ( imageMode ) {
+        switch ( settings.VideoMode() ) {
         case 0:
             modeRes = capture.set( CV_CAP_OPENNI_IMAGE_GENERATOR_OUTPUT_MODE, CV_CAP_OPENNI_VGA_30HZ );
             break;
@@ -81,6 +84,10 @@ void CVideoGrabber::Process()
         cout << "\nDevice doesn't contain image generator." << endl;
     }
 
+
+    CCrossFinder crossFinder( settings );
+    CSpeedFinder speedFinder( settings );
+
     for(;;) {
         Mat image;
 
@@ -90,11 +97,29 @@ void CVideoGrabber::Process()
         } else {
             capture.retrieve( image );
 
-            finder.Process( image );
+        	Mat smallImage = resizeImage( image );
+        	imshow( "gray", smallImage );
+
+            crossFinder.Process( smallImage );
+
+            speedFinder.CalculateTransition( smallImage );
         }
 
         if( waitKey( 30 ) >= 0 )
             break;
     }
+}
+
+Mat CVideoGrabber::resizeImage( const Mat& image ) const
+{
+	Mat smallImage;
+	cvtColor( image, smallImage, CV_BGR2GRAY );
+	Size imageSize = smallImage.size();
+	if( imageSize.width != settings.ImageWidth() ) {
+		double scale = 1.0 * settings.ImageWidth() / imageSize.width;
+		resize( smallImage, smallImage, Size( 0, 0 ), scale, scale,
+				INTER_NEAREST );
+	}
+	return smallImage;
 }
 

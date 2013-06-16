@@ -8,23 +8,21 @@
 #include "CrossFinder.h"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "HoughTransform.h"
 
-CCrossFinder::CCrossFinder()
+CCrossFinder::CCrossFinder( const CImageProcessingSettings& _settings )
 {
-	settings.Load( "CrossFinderSettings.json" );
+	settings = _settings;
 }
 
 CCrossFinder::~CCrossFinder()
 {
-	settings.Save( "CrossFinderSettings.json" );
+
 }
 
 void CCrossFinder::Process( const Mat& image )
 {
-	Mat smallImage = resizeImage( image );
-	imshow( "gray", smallImage );
-
-	Mat edges = findEdges( smallImage );
+	Mat edges = findEdges( image );
 	imshow( "edges", edges );
 
 	vector<Vec2f> lines;
@@ -47,19 +45,6 @@ void CCrossFinder::Process( const Mat& image )
 	imshow( "Detected Lines", lines_image );
 }
 
-Mat CCrossFinder::resizeImage( const Mat& image ) const
-{
-	Mat smallImage;
-	cvtColor( image, smallImage, CV_BGR2GRAY );
-	Size imageSize = smallImage.size();
-	if( imageSize.width != settings.ImageWidth() ) {
-		double scale = 1.0 * settings.ImageWidth() / imageSize.width;
-		resize( smallImage, smallImage, Size( 0, 0 ), scale, scale,
-				INTER_NEAREST );
-	}
-	return smallImage;
-}
-
 Mat CCrossFinder::findEdges( const Mat& image ) const
 {
 	Mat edges;
@@ -75,6 +60,10 @@ void CCrossFinder::findLines( const Mat& edges, vector<Vec2f>& lines ) const
 {
 	HoughLines( edges, lines, settings.HoughDistRes(),
 			settings.HoughAngleRes() * CV_PI / 180, settings.HoughThreshold() );
+//
+//	CHoughTransform transform( settings );
+//	transform.Process( edges );
+//	transform.GetLines( lines );
 }
 
 void CCrossFinder::findParallelLines( const vector<Vec2f>& lines,
@@ -133,17 +122,15 @@ bool CCrossFinder::findCross( vector<Vec3f>& parallelLines, Vec2f& center,
 		}
 	}
 	if( firstLine != -1 && minDiff < settings.MaxPerpendicularDiffRadius() ) {
-		radius = ( parallelLines[firstLine][2] + parallelLines[secondLine][2] ) / 2;
-
 		const float r1 = parallelLines[firstLine][0];
 		const float r2 = parallelLines[secondLine][0];
 		const float a1 = parallelLines[firstLine][1];
 		const float a2 = parallelLines[secondLine][1];
-
 		const float sin12 = sin( a1 - a2 );
 
 		center[0] = ( r2 * sin( a1 ) - r1 * sin( a2 ) ) / sin12;
-		center[0] = ( r1 * cos( a2 ) - r2 * cos( a1 ) ) / sin12;
+		center[1] = ( r1 * cos( a2 ) - r2 * cos( a1 ) ) / sin12;
+		radius = ( parallelLines[firstLine][2] + parallelLines[secondLine][2] ) / 2;
 		return true;
 	}
 
@@ -169,7 +156,7 @@ bool CCrossFinder::isPerpendicularLines( float angle1, float angle2 ) const
 {
 	const float diff = abs( angle1 - angle2 );
 	const float rightDiff = abs( CV_PI / 2 - diff );
-	return rightDiff < settings.MaxPerpendicularDiffAngle();
+	return 180 * rightDiff < settings.MaxPerpendicularDiffAngle() * CV_PI;
 }
 
 float CCrossFinder::middleAngle( float angle1, float angle2 ) const
@@ -241,6 +228,6 @@ void CCrossFinder::drawCircle( Mat& image, const Vec2f& center,
 		float radius ) const
 {
 	Point intCenter( round( center[0] ), round( center[1] ) );
-	circle( image, intCenter, round( radius ), Scalar( 0, 0, 255 ), 2, 8 );
+	circle( image, intCenter, round( radius ), Scalar( 255, 0, 0 ), 3, 8 );
 }
 

@@ -9,21 +9,20 @@
 #define CROSSFINDER_H_
 
 #include "opencv2/core/core.hpp"
-#include "CrossFinderSettings.h"
+#include "ImageProcessingSettings.h"
 
 using namespace cv;
 
 class CCrossFinder {
 public:
-	CCrossFinder();
+	CCrossFinder( const CImageProcessingSettings& settings );
 	virtual ~CCrossFinder();
 
 	void Process( const Mat& image );
 
 private:
-	CCrossFinderSettings settings;
+	CImageProcessingSettings settings;
 
-	Mat resizeImage( const Mat& image ) const;
 	Mat findEdges( const Mat& image ) const;
 	void findLines( const Mat& edges, vector<Vec2f>& lines ) const;
 	void findParallelLines( const vector<Vec2f>& lines,
