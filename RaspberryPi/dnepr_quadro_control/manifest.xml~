@@ -1,0 +1,17 @@
+<package>
+  <description brief="dnepr_quadro_control">
+
+     dnepr_quadro_control
+
+  </description>
+  <author>root</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dnepr_quadro_control</url>
+  <depend package="openni_camera"/>
+  <depend package="opencv2"/>
+  <depend package="pcl"/>
+
+</package>
+
+

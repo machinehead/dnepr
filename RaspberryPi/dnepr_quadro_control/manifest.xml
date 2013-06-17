@@ -1,0 +1,17 @@
+<package>
+  <description brief="dnepr_quadro_control">
+	ROS package for controlling quadrocopter in CROC's flying robots competition
+	This package contains all nodes, that run on Raspberry Pi under Raspbian linux distribution.
+	This package does not contain code, that runs on arduino.
+  </description>
+  <author>dnepr_team</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>https://github.com/machinehead/dnepr.git</url>
+  <depend package="openni_camera"/>
+  <depend package="opencv2"/>
+  <depend package="pcl"/>
+
+</package>
+
+
