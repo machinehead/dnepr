@@ -60,10 +60,6 @@ void computeIMU () {
       gyroData[axis] = (int16_t) ( ( (int32_t)((int32_t)gyroSmooth[axis] * (conf.Smoothing[axis]-1) )+gyroData[axis]+1 ) / conf.Smoothing[axis]);
       gyroSmooth[axis] = gyroData[axis];
     }
-  #elif defined(TRI)
-    static int16_t gyroYawSmooth = 0;
-    gyroData[YAW] = (gyroYawSmooth*2+gyroData[YAW])/3;
-    gyroYawSmooth = gyroData[YAW];
   #endif
 }
 

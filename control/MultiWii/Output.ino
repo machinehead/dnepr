@@ -6,12 +6,6 @@
 uint8_t PWM_PIN[8] = {9,10,11,3,6,5,A2,12};   //for a quad+: rear,right,left,front
 
 /**************************************************************************************/
-/***************   Writes the Servos values to the needed format   ********************/
-/**************************************************************************************/
-void writeServos() {
-}
-
-/**************************************************************************************/
 /************  Writes the Motors values to the PWM compare register  ******************/
 /**************************************************************************************/
 void writeMotors() { // [1000;2000] => [125;250]
@@ -66,7 +60,7 @@ void initOutput() {
   }
     
   /********  Specific PWM Timers & Registers for the atmega328P (Promini)   ************/
-  #if defined(PROMINI)
+  
     #if (NUMBER_MOTOR > 0)
       TCCR1A |= _BV(COM1A1); // connect pin 9 to timer 1 channel A
     #endif
@@ -86,7 +80,6 @@ void initOutput() {
         pinMode(A0,OUTPUT);pinMode(A1,OUTPUT);
       #endif
     #endif
-  #endif
 
   /********  special version of MultiWii to calibrate all attached ESCs ************/
   #if defined(ESC_CALIB_CANNOT_FLY)
@@ -122,16 +115,12 @@ void mixTable() {
     axisPID[YAW] = constrain(axisPID[YAW],-100-abs(rcCommand[YAW]),+100+abs(rcCommand[YAW]));
   #endif
   /****************                   main Mix Table                ******************/
-  #ifdef MY_PRIVATE_MIXING
-    #include MY_PRIVATE_MIXING
-  #else
-    #ifdef QUADX
+  
       motor[0] = PIDMIX(-1,+1,-1); //REAR_R
       motor[1] = PIDMIX(-1,-1,+1); //FRONT_R
       motor[2] = PIDMIX(+1,+1,+1); //REAR_L
       motor[3] = PIDMIX(+1,-1,-1); //FRONT_L
-    #endif
-  #endif //MY_PRIVATE_MIXING
+  
   /****************                Filter the Motors values                ******************/
   #ifdef GOVERNOR_P
     if (rcOptions[BOXGOV] ) {
