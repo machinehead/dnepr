@@ -1,7 +1,7 @@
 //Узел, занимающийся преобразованием команд полёта в "сырые" значения ручек управления (как с джойстика)
 #include <ros/ros.h>
 #include "dnepr_quadro_control/RawArduinoControl.h"
-#include "FlightDirection.h"
+#include "dnepr_quadro_control/FlightDirection.h"
 
 ros::Publisher* resultPublisher = 0;
 
@@ -20,9 +20,6 @@ int main(int argc, char **argv)
 
   ros::Subscriber flight_direction_sub = rosNode.subscribe( "flight_direction", 1000, flightDirectionRecievedCallback );
 
-  while (ros::ok())
-  {
-    ros::spinOnce();
-  }
+  ros::spin();
   return 0;
 }
