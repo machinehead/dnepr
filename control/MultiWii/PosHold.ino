@@ -61,8 +61,8 @@ void reset_PID(struct PID_* pid) {
 #define _X 1
 #define _Y 0
 
-#define NAV_SPEED_MAX              20    // cm/sec
-#define NAV_BANK_MAX               500  // 5deg max banking when navigating (just for security and testing)
+#define NAV_SPEED_MAX              50    // cm/sec
+#define NAV_BANK_MAX               750  // 5deg max banking when navigating (just for security and testing)
 
 static float  dTnav;            // Delta Time in milliseconds for navigation computations, updated with every good GPS read
 static int16_t actual_speed[2] = {0,0};
@@ -74,7 +74,7 @@ static int32_t error[2];
 
 void GPS_NewData() {
   static int32_t sonarTimestamp[2] = {0,0};
-  if(srf08_ctx.readAt[1] <= sonarTimestamp[0] || srf08_ctx.readAt[2] <= sonarTimestamp[1]) return; // sonars haven't been updated
+  if(srf08_ctx.readAt[1] <= sonarTimestamp[0] && srf08_ctx.readAt[2] <= sonarTimestamp[1]) return; // sonars haven't been updated
   sonarTimestamp[0] = srf08_ctx.readAt[1];
   sonarTimestamp[1] = srf08_ctx.readAt[2];
   
@@ -189,6 +189,8 @@ void GPS_distance_cm_bearing(int32_t* lat1, int32_t* lon1, int32_t* lat2, int32_
   if (*bearing < 0) *bearing += 36000;
 }
 
+#define ACT_SPD_WEIGHT (2)
+
 ////////////////////////////////////////////////////////////////////////////////////
 // Calculate our current speed vector from gps position data
 //
@@ -204,8 +206,8 @@ static void GPS_calc_velocity(){
     actual_speed[_X] = -(float)(GPS_coord[LON] - last[LON]) * tmp;
     actual_speed[_Y] = (float)(GPS_coord[LAT]  - last[LAT])  * tmp;
   
-    actual_speed[_X] = (actual_speed[_X] + speed_old[_X]) / 2;
-    actual_speed[_Y] = (actual_speed[_Y] + speed_old[_Y]) / 2;
+    actual_speed[_X] = (actual_speed[_X] * ACT_SPD_WEIGHT + speed_old[_X]) / (1 + ACT_SPD_WEIGHT);
+    actual_speed[_Y] = (actual_speed[_Y] * ACT_SPD_WEIGHT + speed_old[_Y]) / (1 + ACT_SPD_WEIGHT);
   
     speed_old[_X] = actual_speed[_X];
     speed_old[_Y] = actual_speed[_Y];
@@ -249,13 +251,11 @@ static void GPS_calc_poshold() {
     int32_t i = get_I(rate_error[axis] + error[axis], &dTnav, &poshold_ratePID[axis], &poshold_ratePID_PARAM);
     d = get_D(error[axis],                    &dTnav, &poshold_ratePID[axis], &poshold_ratePID_PARAM);
 
-    if(axis == _X) {
+    if(axis == _Y) {
       debug[0] = p;
       debug[1] = d;
-    }
-    else if(axis == _Y) {
-      debug[2] = p;
-      debug[3] = d;
+      debug[2] = target_speed;
+      debug[3] = actual_speed[axis];
     }
     
     /*

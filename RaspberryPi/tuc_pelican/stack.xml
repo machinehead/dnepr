@@ -1,0 +1,13 @@
+<stack>
+  <description brief="tuc_pelican">The tuc_pelican stack contains packages for the AscTec Pelican quadrotor.</description>
+  <author>Maintained by Niko Suenderhauf, Peer Neubert, Sebastian Drews</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tuc_pelican</url>
+  <depend stack="ros" />
+  <depend stack="image_common" />
+  <depend stack="kinect" />
+  <depend stack="point_cloud_perception" />
+  <depend stack="vision_opencv" />
+  <depend stack="visualization_common" />
+</stack>

@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -O2 -g   -shared -Wl,-soname,libgtest.so -o /home/egor/dnepr_quadro_control/lib/libgtest.so CMakeFiles/gtest.dir/src/gtest-all.cc.o -L/home/egor/dnepr_quadro_control/build/gtest/src -lpthread -Wl,-rpath,/home/egor/dnepr_quadro_control/build/gtest/src 

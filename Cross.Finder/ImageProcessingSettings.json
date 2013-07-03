@@ -1,0 +1,40 @@
+{
+    "Cross":
+    {
+        "Canny":
+        {
+            "Blur":
+            {
+                "Radius": "7",
+                "Sigma": "3"
+            },
+            "Threshold1": "80",
+            "Threshold2": "30"
+        },
+        "Hough":
+        {
+            "DistanceResolution": "1",
+            "AngleResolution": "1",
+            "Threshold": "100"
+        },
+        "Parallel":
+        {
+            "MaxAngleDiff": "15"
+        },
+        "Intersection":
+        {
+            "MaxAngleDiff": "15",
+            "MaxRadiusDiff": "10"
+        }
+    },
+    "Video":
+    {
+        "Mode": "0",
+        "Input": "0",
+        "Width": "320"
+    },
+    "Speed":
+    {
+        "WindowPercent": "40"
+    }
+}
