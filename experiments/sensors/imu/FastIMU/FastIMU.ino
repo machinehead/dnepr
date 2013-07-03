@@ -62,6 +62,7 @@ void loop() //Main Loop
     
     Read_Gyro();      // This read gyro data
     Read_Accel();     // Read I2C accelerometer
+    /*
     if(sonarPingRead) {
       Sonar_Read();     // Read sonar
       if(sonarNew)
@@ -77,7 +78,7 @@ void loop() //Main Loop
       // Also read compass data at 10Hz...
       Read_Compass();    // Read I2C magnetometer
     }
- 
+    */
     printdata();
   }
    
