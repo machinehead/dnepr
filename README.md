@@ -25,9 +25,31 @@ dnepr
 * $ rosdep update (<i>? maybe don't need this<i>)
 * $ sudo apt-get install ros-groovy-openni-camera
 * $ sudo apt-get install ros-groovy-opencv2
+* $ make
+
+## Running
+
+* $ sudo apt-get install ros-groovy-roslaunch
+* $ roscore # should work
+* $ 
 
 # "Failed to download target platform data for gbpdistro" error at "rosdep update" step
 (http://answers.ros.org/question/9201/how-do-i-install-a-missing-ros-package/)
 * sudo pip uninstall rosdep
 * sudo pip install rosdep
 
+Starting from scratch with ROS
+==============================
+
+* Get fresh Raspbian "wheezy" here: http://www.raspberrypi.org/downloads
+* Start it with a monitor & kb, do initial $ raspi-config
+* SSH
+* Follow instructions for ROS binary packages here: http://www.ros.org/wiki/groovy/Installation/Raspbian
+* $ sudo apt-get install ros-groovy-ros-comm ros-groovy-roslaunch
+* $ cd /opt/ros/groovy
+* $ source setup.bash
+* Git clone dnepr_quadro_control to /home/pi/dnepr/RaspberryPi/dnepr_quadro_control
+* $ export ROS_PACKAGE_PATH=/home/pi/projects/dnepr/RaspberryPi:$ROS_PACKAGE_PATH
+* $ sudo rosdep init
+* $ sudo rosdep update
+* $ rosdep install dnepr_quadro_control
