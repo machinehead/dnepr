@@ -1,4 +1,4 @@
-function [] = plotAccs()
+function [] = plotAccs(datasource)
     times = [0];
     accs = [];
     % z max + = 1073
@@ -50,6 +50,6 @@ function [] = plotAccs()
     end
 
     tm1 = 0;
-    serialLoop(@iter);
+    datasource(@iter);
 
 end
